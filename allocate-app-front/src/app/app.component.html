@@ -1,0 +1,6 @@
+<div class="container">
+  <app-header></app-header>
+  <div class="container-router" [@routeAnimation]="getAnimationData(routerOutlet)">
+    <router-outlet #routerOutlet="outlet"></router-outlet>
+  </div>
+</div>

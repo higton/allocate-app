@@ -1,0 +1,32 @@
+<div id="container" class="in-center">
+  <div id="signup-container" class="in-center">
+    <img id="icon-image" src="../../assets/Pokeball.PNG">
+    <div id="signup-title">
+     <h2>CREATE ACCOUNT</h2>
+     <hr>
+    </div>
+    <div id="container-input" class="in-column">
+      <div id="error-message" *ngIf="showErrorMessage">
+      {{showErrorMessage}}
+      </div>
+
+        <input id="input-username" class="text-input"
+          #username
+          type="username"
+          name="username"
+          placeholder="Enter username"
+          required
+        />
+        <input id="input-password" class="text-input"
+          #password
+          type="password"
+          name="password"
+          placeholder="Enter password"
+          required
+        />
+      <div id="button-container">
+        <button id="signup-button" (click)="signup(username.value, password.value)">Create account</button>
+      </div>
+    </div>
+  </div>
+</div>

@@ -1,0 +1,18 @@
+.in-center{
+	display: flex;
+	justify-content: center;
+	width: calc(100% - 300px);
+	min-width: 300px;
+	margin-left: 20px;
+}
+
+#edit-user-container{
+	padding: 100px 40px;
+	display: flex;
+	flex-flow: row wrap;
+}
+
+#change-profile-picture{
+	width: 200px;
+	margin-bottom: 20px;
+}

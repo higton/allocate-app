@@ -1,0 +1,81 @@
+#container{
+	height: 100%;
+	width: 100%;
+	min-height: 73.5vh;
+	padding: 100px 40px;
+}
+
+#login-container{
+	width: 500px;
+	height: 500px;
+	padding: 20px 40px;
+	border-radius: 12px;
+	box-shadow: 0 12px 18px 2px rgba(34,0,51,.04),0 6px 22px 4px rgba(7,48,114,.12),0 6px 10px -4px rgba(14,13,26,.12);
+}
+
+.in-center{
+	display: flex;
+	flex-flow: column nowrap;
+	justify-content: center;
+	align-items: center;
+}
+
+.in-column{
+	display: flex;
+	flex-flow: column nowrap;
+}
+
+.input-description{
+	font-size: 15px;
+	line-height: 22px;
+}
+
+#icon-image{
+	height: 40px;
+	width: 40px;
+}
+
+#container-input{
+	margin-bottom: 40px;
+}
+
+#login-title{
+	text-align: center;
+	margin-bottom: 60px;
+	width: 100%;
+}
+
+#input-username{
+	margin-bottom: 20px;
+}
+
+#input-password{
+	margin-bottom: 40px;
+}
+
+.text-input{
+	height: 48px;
+}
+
+#login-button{
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	height: 48px;
+	width: 100%;
+	font-weight: 700;
+	border-radius: 6px;
+	cursor: pointer;
+	color: white;
+	background-color: rgb(230, 0, 35);
+}
+
+#login-button:hover{
+	background-color: #343a40;
+}
+
+@media(max-width: 1200px){
+	#login-container{
+		width: 300px;
+	}
+}
