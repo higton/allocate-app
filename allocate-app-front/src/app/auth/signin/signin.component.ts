@@ -19,18 +19,19 @@ export class SigninComponent implements OnInit {
   ngOnInit(): void {
   }
 
-  async signup(username: String, password: String) {
+  async signup(email: String, password: String) {
     this.showErrorMessage = '';
 
-    await this.authService.signup(username, password)
+    await this.authService.signup(email, password)
     .then((result:any) => {
-      console.log('result', result);
-      if(result.errors){
-        this.showErrorMessage = this.authService.translateErrorMessage(result.errors[0].message);
+      if (result.errors && result.errors.length > 0) {
+        this.showErrorMessage = result.errors[0].message;
       }
+
+      console.log('this.showErrorMessage', this.showErrorMessage);
     })
     .catch(error =>{
-     this.showErrorMessage = this.authService.translateErrorMessage(error);
+      this.showErrorMessage = this.authService.translateErrorMessage(error);
     });
   }
 }

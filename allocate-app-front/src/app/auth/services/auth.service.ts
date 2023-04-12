@@ -1,7 +1,10 @@
 import { Injectable } from '@angular/core';
 import { Router } from '@angular/router';
 import { BehaviorSubject } from 'rxjs';
+
 import { ServerService } from './server.service';
+import { Course } from 'src/app/models/Course';
+import { Classroom } from 'src/app/models/Classroom';
 
 @Injectable({
   providedIn: 'root'
@@ -10,7 +13,7 @@ export class AuthService {
   private loggedIn = new BehaviorSubject<boolean>(false);
   private token: string;
   public user: {
-    username: String,
+    email: String,
   };
   
   // store the URL so we can redirect after logging in
@@ -43,26 +46,26 @@ export class AuthService {
     } else {
       this.loggedIn.next(true);
 
-      // Save the username locally to avoid making a lot of requests to
+      // Save the email locally to avoid making a lot of requests to
       // the server
       if(!this.user){
-        this.saveUsernameLocally();
+        this.saveUserLocally();
       }
     }
   }
 
-  async saveUsernameLocally(){
+  async saveUserLocally(){
     let tmp:any = await this.getUserFromToken();
     this.user = tmp;
   }
 
-  getUsername():any{
+  getEmail(): Promise<String>{
     return new Promise(async (resolve, reject) => {
       if(!this.user){
         let user:any = await this.getUserFromToken();
-        resolve(user.username);
+        resolve(user.email);
       } else {
-        resolve(this.user.username)
+        resolve(this.user.email)
       }
     });
   }
@@ -71,7 +74,7 @@ export class AuthService {
     const query = `
       query{
         getUserFromToken{
-          username,
+          email,
         }
       }
     `;
@@ -88,21 +91,21 @@ export class AuthService {
     });
   }
 
-  signup(username: String, password: String) {
-    let query = `mutation AddUser($username: String!, $password: String!) {
-      addUser(username: $username, password: $password)
+  signup(email: String, password: String) {
+    let query = `mutation AddUser($email: String!, $password: String!) {
+      addUser(email: $email, password: $password)
     }`;
 
     return new Promise((resolve, reject) => {
       this.server.request('POST', '/graphql', 
         JSON.stringify({
           query,
-          variables: { username, password },
+          variables: { email, password },
         })
       ).subscribe(
         async (response: any) => {
           if(!response.errors){
-            await this.login(username, password);
+            await this.login(email, password);
           }
           console.log('response', response);
           resolve(response);
@@ -115,12 +118,12 @@ export class AuthService {
     })
   }
 
-  login(username: String, password: String) {
+  login(email: String, password: String) {
     let token = '';
 
     return new Promise((resolve, reject) => {
       this.server.request('POST', '/api/authenticate', {
-        username: username,
+        email: email,
         password: password
       }).subscribe(
         async (response: any) => {
@@ -180,7 +183,7 @@ export class AuthService {
             // Store the attempted URL for redirecting
             this.redirectUrl = url;
 
-            console.log('erro', err);
+            console.log('error', err);
             resolve(false);
           }
         );
@@ -218,39 +221,16 @@ export class AuthService {
     });
   }
 
-
-  deleteAccount(username: String){
-    let query = `mutation deleteUser($username: String!) {
-      deleteUser(username: $username)
-    }`;
-
-    this.server.request('POST', '/graphql', 
-      JSON.stringify({
-        query,
-        variables: { username },
-      })
-    ).subscribe((response: any) => {
-      console.log('response', response);
-      this.server.setLoggedIn(false);
-      delete this.token;
-      delete this.user;
-  
-      this.loggedIn.next(false);
-      localStorage.clear();
-      this.router.navigate(['/']);
-    })
-  }
-
-  changePassword(username: String, newPassword: String){
-    let query = `mutation changePassword($username: String!, $newPassword: String!) {
-      changePassword(username: $username, newPassword: $newPassword)
+  changePassword(email: String, newPassword: String){
+    let query = `mutation changePassword($email: String!, $newPassword: String!) {
+      changePassword(email: $email, newPassword: $newPassword)
     }`;
 
     return new Promise<void>((resolve, reject) => {
       this.server.request('POST', '/graphql', 
         JSON.stringify({
           query,
-          variables: { username, newPassword },
+          variables: { email, newPassword },
         })
       ).subscribe((response: any) => {
         console.log('response', response);
@@ -259,10 +239,10 @@ export class AuthService {
     });
   }
 
-  isUsernameExistent(username: String){
+  isEmailExistent(email: String){
     const query = `
-      query checkUsername($username: String!){
-        checkUsername(username: $username)
+      query checkEmail($email: String!){
+        checkEmail(email: $email)
       }
     `;
 
@@ -270,12 +250,12 @@ export class AuthService {
       this.server.request('POST', '/graphql', 
         JSON.stringify({ 
           query,
-          variables: { username },
+          variables: { email },
         })
       ).subscribe(
         (response: any) => { 
           console.log('response', response);
-          if(response.data.checkUsername){
+          if(response.data.checkEmail){
             resolve(true);
           } else {
             console.log('erros: ', response);
@@ -289,15 +269,210 @@ export class AuthService {
     });
   }
 
+  addCourseToAccount(course_name: String, course_class_number: Number, course_number_of_students: Number, account_email: String){
+    let query = `mutation addCourseToAccount($course_name: String!, $course_class_number: Int!, $course_number_of_students: Int!, $account_email: String!) {
+      addCourseToAccount(course_name: $course_name, course_class_number: $course_class_number, course_number_of_students: $course_number_of_students, account_email: $account_email)
+    }`;
+
+    return new Promise<void>((resolve, reject) => {
+      this.server.request('POST', '/graphql',
+        JSON.stringify({
+          query,
+          variables: { course_name, course_class_number, course_number_of_students, account_email },
+        })
+      ).subscribe((response: any) => {
+        console.log('response', response);
+        resolve();
+      },
+      (err) => { 
+        console.log('error', err);
+        reject(err);
+      })
+    });
+  }
+
+  getCoursesFromAccount(email: String): Promise<Course[]>{
+    const query = `
+      query getCoursesFromAccount($email: String!){
+        getCoursesFromAccount(email: $email) {
+          name,
+          class_number,
+          number_of_students
+        }
+      }
+    `;
+
+    return new Promise((resolve, reject) => {
+      this.server.request('POST', '/graphql',
+        JSON.stringify({
+          query,
+          variables: { email },
+        })
+      ).subscribe(
+        (response: any) => {
+          resolve(response.data.getCoursesFromAccount);
+        },
+        (err) => {
+          console.log('error', err);
+          reject(err);
+        })
+    });
+  }
+
+  removeCourseFromAccount(course_name: String, course_class_number: Number, account_email: String){
+    const query = `
+      mutation removeCourseFromAccount($course_name: String!, $course_class_number: Int!, $account_email: String!) {
+        removeCourseFromAccount(course_name: $course_name, course_class_number: $course_class_number, account_email: $account_email)
+      }
+    `;
+
+    return new Promise<void>((resolve, reject) => {
+      this.server.request('POST', '/graphql',
+        JSON.stringify({
+          query,
+          variables: { course_name, course_class_number, account_email },
+        })
+      ).subscribe((response: any) => {
+        console.log('response', response);
+        resolve();
+      },
+      (err) => {
+        console.log('error', err);
+        reject(err);
+      })
+    });
+  }
+
+  // create function fro this query editCourseFromAccount(account_email: String!, course_name: String!, course_class_number: Int!, course_number_of_students: Int!}: String,
+  editCourseFromAccount(account_email: String, course_name: String, course_class_number: Number, course_number_of_students: Number){
+    const query = `
+      mutation editCourseFromAccount($account_email: String!, $course_name: String!, $course_class_number: Int!, $course_number_of_students: Int!) {
+        editCourseFromAccount(account_email: $account_email, course_name: $course_name, course_class_number: $course_class_number, course_number_of_students: $course_number_of_students)
+      }
+    `;
+
+    return new Promise<void>((resolve, reject) => {
+      this.server.request('POST', '/graphql',
+        JSON.stringify({
+          query,
+          variables: { account_email, course_name, course_class_number, course_number_of_students },
+        })
+      ).subscribe((response: any) => {
+        console.log('response', response);
+        resolve();
+      },
+      (err) => {
+        console.log('error', err);
+        reject(err);
+      })
+    });
+  }
+
+  addClassroomToAccount(classroom_name: String, classroom_number_of_seats: Number, account_email: String){
+    const query = `
+      mutation addClassroomToAccount($classroom_name: String!, $classroom_number_of_seats: Int!, $account_email: String!) {
+        addClassroomToAccount(classroom_name: $classroom_name, classroom_number_of_seats: $classroom_number_of_seats, account_email: $account_email)
+      }
+    `;
+
+    return new Promise<void>((resolve, reject) => {
+      this.server.request('POST', '/graphql',
+        JSON.stringify({
+          query,
+          variables: { classroom_name, classroom_number_of_seats, account_email },
+        })
+      ).subscribe((response: any) => {
+        console.log('response', response);
+        resolve();
+      },
+      (err) => {
+        console.log('error', err);
+        reject(err);
+      })
+    });
+  }
+
+  removeClassroomFromAccount(classroom_name: String, account_email: String){
+    const query = `
+      mutation removeClassroomFromAccount($classroom_name: String!, $account_email: String!) {
+        removeClassroomFromAccount(classroom_name: $classroom_name, account_email: $account_email)
+      }
+    `;
+
+    return new Promise<void>((resolve, reject) => {
+      this.server.request('POST', '/graphql',
+        JSON.stringify({
+          query,
+          variables: { classroom_name, account_email },
+        })
+      ).subscribe((response: any) => {
+        console.log('response', response);
+        resolve();
+      },
+      (err) => {
+        console.log('error', err);
+        reject(err);
+      })
+    });
+  }
+
+  editClassroomFromAccount(classroom_name: String, classroom_number_of_seats: Number, account_email: String){
+    const query = `
+      mutation editClassroomFromAccount($classroom_name: String!, $classroom_number_of_seats: Int!, $account_email: String!) {
+        editClassroomFromAccount(classroom_name: $classroom_name, classroom_number_of_seats: $classroom_number_of_seats, account_email: $account_email)
+      }
+    `;
+
+    return new Promise<void>((resolve, reject) => {
+      this.server.request('POST', '/graphql',
+        JSON.stringify({
+          query,
+          variables: { classroom_name, classroom_number_of_seats, account_email },
+        })
+      ).subscribe((response: any) => {
+        console.log('response', response);
+        resolve();
+      },
+      (err) => {
+        console.log('error', err);
+        reject(err);
+      })
+    });
+  }
+
+  getClassroomsFromAccount(email: String): Promise<Classroom[]>{
+    const query = `
+      query getClassroomsFromAccount($email: String!) {
+        getClassroomsFromAccount(email: $email) {
+          name
+          number_of_seats
+        }
+      }
+    `;
+
+    return new Promise((resolve, reject) => {
+      this.server.request('POST', '/graphql',
+        JSON.stringify({
+          query,
+          variables: { email },
+        })
+      ).subscribe((response: any) => {
+        console.log('response', response);
+        resolve(response.data.getClassroomsFromAccount);
+      },
+      (err) => {
+        console.log('error', err);
+        reject(err);
+      })
+    });
+  }
+
   translateErrorMessage(error: any){
     if(error.statusText === "Unauthorized"){
       return 'Wrong password';
     }
     if(error.statusText === "Unknown Error"){
       return 'No connection with the server';
-    }
-    if(error === "This username already exist"){
-      return 'This username already exist';
     }
   }
 }

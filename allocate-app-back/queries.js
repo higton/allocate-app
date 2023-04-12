@@ -22,11 +22,64 @@ pool.on('error', (err, client) => {
 init();
 
 async function init(){
-	await pool.query(`
-			CREATE TABLE IF NOT EXISTS users (
-			    username varchar UNIQUE,
-			    password varchar
-			)
+	// for each table modify the primary key to be a autoincrementing id
+	pool.query(`
+		CREATE TABLE IF NOT EXISTS COURSE (
+			id SERIAL PRIMARY KEY,
+			name VARCHAR(30) NOT NULL,
+			class_number INT NOT NULL,
+			number_of_students INT NOT NULL
+		)
+		`, (res, err) => {
+		console.log(res, err);
+	})
+
+	// email has to be unique
+	pool.query(`
+		CREATE TABLE IF NOT EXISTS ACCOUNT (
+			id SERIAL PRIMARY KEY,
+			email VARCHAR(30) UNIQUE NOT NULL,
+			password VARCHAR(200) NOT NULL
+		)
+		`, (res, err) => {
+		console.log(res, err);
+	})
+
+	pool.query(`
+		CREATE TABLE IF NOT EXISTS CLASSROOM (
+			id SERIAL PRIMARY KEY,
+			name VARCHAR(30) NOT NULL,
+			number_of_seats INT NOT NULL
+		)
+	`, (res, err) => {
+		console.log(res, err);
+	})
+
+	// wait for the previous queries to finish
+	await new Promise(resolve => setTimeout(resolve, 5000));
+
+	pool.query(`
+		CREATE TABLE IF NOT EXISTS COURSES_ACCOUNT (
+			id SERIAL PRIMARY KEY,
+			fk_account_id INT NOT NULL,
+			fk_course_id INT NOT NULL,
+
+			FOREIGN KEY (fk_account_id) REFERENCES ACCOUNT (id),
+			FOREIGN KEY (fk_course_id) REFERENCES COURSE (id)
+		)
+		`, (res, err) => {
+		console.log(res, err);
+	})
+
+	pool.query(`
+		CREATE TABLE IF NOT EXISTS CLASSROOMS_ACCOUNT (
+			id SERIAL PRIMARY KEY,
+			fk_account_id INT NOT NULL,
+			fk_classroom_id INT NOT NULL,
+
+			FOREIGN KEY (fk_account_id) REFERENCES ACCOUNT (id),
+			FOREIGN KEY (fk_classroom_id) REFERENCES CLASSROOM (id)
+		)
 		`, (res, err) => {
 		console.log(res, err);
 	})
@@ -35,18 +88,17 @@ async function init(){
 const saltRounds = 10;
 
 async function getUsers(){
-	return pool.query('select * FROM users').then((response) => {
+	return pool.query('select * FROM ACCOUNT').then((response) => {
     return response.rows
   }).catch((error) => {
   	return new Error(error);
   })
 }
 
-async function getUser(username){
+async function getUser(email){
 	return pool.query(
-		'SELECT * FROM users WHERE username = ($1)', [username])
+		'SELECT * FROM ACCOUNT WHERE email = ($1)', [email])
 	.then((response) => {
-		console.log('reponse', response.rows);
 		return response.rows[0];
 	})
 	.catch((err) => {
@@ -54,8 +106,22 @@ async function getUser(username){
 	})
 }
 
+async function getCoursesFromAccount(email){
+	return pool.query(`
+		SELECT name, class_number, number_of_students FROM COURSES_ACCOUNT
+		JOIN ACCOUNT ON ACCOUNT.id = fk_account_id
+		JOIN COURSE ON COURSE.id = fk_course_id
+		WHERE ACCOUNT.email = ($1)`,
+		[email]
+	).then((response) => {
+		return response.rows;
+	}).catch((error) => {
+		return new Error(error);
+	})
+}
+
 async function createUser(request){
-	let { username, password } = request
+	let { email, password } = request
 
 	const hashedPassword = await new Promise((resolve, reject) => {
 		bcrypt.hash(password, saltRounds, function(err, hash) {
@@ -64,28 +130,25 @@ async function createUser(request){
 		});
 	})
 
-	let tmp = await this.getUser(username);
+	let tmp = await this.getUser(email);
 
 	if(!tmp && hashedPassword){
 		return pool.query(
-			'INSERT INTO users (username, password) VALUES ($1, $2)',
-			 [username, hashedPassword]
+			'INSERT INTO ACCOUNT (email, password) VALUES ($1, $2)',
+			 [email, hashedPassword]
 		)
-		.then((response) => {
-			console.log('response', response);
+		.then(() => {
 			return "User added!"
 		}).catch((error) => {
-			// print error
-			console.log('error', error);
 			return new Error(error);
 		})
 	} else {
-		return new Error("This username already exist");
+		return new Error("This account already exist");
 	}
 }
 
-async function isCorrectPassword(username, password){
-		const user = await getUser(username);
+async function isCorrectPassword(email, password){
+	const user = await getUser(email);
 
 	return await new Promise((resolve, reject) => {
 		bcrypt.compare(password, user.password, function(err, same) {
@@ -98,20 +161,7 @@ async function isCorrectPassword(username, password){
 	});
 }
 
-async function deleteUser(username){
-	return pool.query(
-		'DELETE FROM users WHERE username = ($1)', [username])
-	.then((response) => {
-		return "User removed!123";
-	}).catch((err) =>{
-		return new Error(err);
-	});
-}
-
-async function changePassword(username, newPassword){
-	console.log('username', username);
-	console.log('newPassword', newPassword);
-
+async function changePassword(email, newPassword){
 	const hashedPassword = await new Promise((resolve, reject) => {
 		bcrypt.hash(newPassword, saltRounds, function(err, hash) {
 		  if (err) reject(err)
@@ -120,20 +170,211 @@ async function changePassword(username, newPassword){
 	})
 	
 	return pool.query(
-		'UPDATE users SET password = ($1) WHERE username = ($2)', [hashedPassword, username])
-	.then((response) => {
-		console.log('response', response);
+		'UPDATE ACCOUNT SET password = ($1) WHERE email = ($2)', [hashedPassword, email])
+	.then(() => {
 		return "Password changed!";
 	}).catch((error) => {
 		return new Error(error);
 	});
 };
 
+async function addCourse(name, class_number, number_of_students){
+	return pool.query(
+		'INSERT INTO COURSE (name, class_number, number_of_students) VALUES ($1, $2, $3)',
+		 [name, class_number, number_of_students]
+	)
+	.then((response) => {
+		return "Course added!"
+	}).catch((error) => {
+		return new Error(error);
+	})
+};
+
+async function addCourseToAccount(account_email, course_name, course_class_number){
+	return pool.query(`
+		INSERT INTO COURSES_ACCOUNT (fk_account_id, fk_course_id)
+		SELECT ACCOUNT.id, COURSE.id FROM ACCOUNT, COURSE 
+		WHERE ACCOUNT.email = ($1)
+		AND COURSE.name = ($2)
+		AND COURSE.class_number = ($3)`,
+		 [account_email, course_name, course_class_number]
+	).then((response) => {
+		return "Course added to user!"
+	}).catch((error) => {
+		return new Error(error);
+	})
+};
+
+async function removeCourseFromAccount(account_email, course_name, course_class_number){
+	return pool.query(`
+		DELETE FROM COURSES_ACCOUNT
+		WHERE fk_account_id IN (SELECT id FROM ACCOUNT WHERE email = $1)
+		AND fk_course_id IN (SELECT id FROM COURSE WHERE name = $2 AND class_number = $3)`,
+		 [account_email, course_name, course_class_number]
+	).then((response) => {
+		return "Course removed from user!"
+	}).catch((error) => {
+		return new Error(error);
+	})
+};
+
+async function editCourseFromAccount(account_email, new_course_name, new_course_class_number, new_number_of_students){
+	// print all parameters
+	console.log('parameters: ', account_email, new_course_name, new_course_class_number, new_number_of_students);
+	return pool.query(`
+		UPDATE COURSE 
+			SET name = $1, class_number = $2, number_of_students = $3
+		FROM COURSES_ACCOUNT
+		WHERE COURSES_ACCOUNT.fk_account_id = (SELECT id FROM ACCOUNT WHERE email = $4)
+		AND COURSES_ACCOUNT.fk_course_id = COURSE.id`,
+		 [new_course_name, new_course_class_number, new_number_of_students, account_email]
+	).then((response) => {
+		return "Course edited from user!"
+	}).catch((error) => {
+		// print error
+		console.log(error);
+		return new Error(error);
+	})
+};
+
+
+async function addClassroom(name, number_of_seats){
+	return pool.query(
+		'INSERT INTO CLASSROOM (name, number_of_seats) VALUES ($1, $2)',
+		 [name, number_of_seats]
+	)
+	.then((response) => {
+		return "Classroom added!"
+	}).catch((error) => {
+		return new Error(error);
+	})
+};
+
+async function addClassroomToAccount(account_email, classrom_name){
+	return pool.query(`
+		INSERT INTO CLASSROOMS_ACCOUNT (fk_account_id, fk_classroom_id)
+		SELECT ACCOUNT.id, CLASSROOM.id FROM ACCOUNT, CLASSROOM
+		WHERE ACCOUNT.email = ($1)
+		AND CLASSROOM.name = ($2)`,
+		 [account_email, classrom_name]
+	).then((response) => {
+		return "Classroom added to user!"
+	}).catch((error) => {
+		return new Error(error);
+	})
+};
+
+async function removeClassroomFromAccount(account_email, classroom_id){
+	return pool.query(`
+		DELETE FROM CLASSROOMS_ACCOUNT
+		WHERE fk_account_id IN (SELECT id FROM ACCOUNT WHERE email = $1)
+		AND fk_classroom_id = $2`,
+		 [account_email, classroom_id]
+	).then((response) => {
+		return "Classroom removed from user!"
+	}).catch((error) => {
+		return new Error(error);
+	})
+};
+
+async function getClassroomIdFromAccount(account_email, classroom_name){
+	return pool.query(`
+		SELECT CLASSROOM.id FROM CLASSROOM
+		WHERE CLASSROOM.name = $1
+		AND CLASSROOM.id IN (SELECT fk_classroom_id FROM CLASSROOMS_ACCOUNT WHERE fk_account_id = (SELECT id FROM ACCOUNT WHERE email = $2))`,
+		 [classroom_name, account_email]
+	).then((response) => {
+		return response.rows[0].id;
+	}).catch((error) => {
+		return new Error(error);
+	})
+};
+
+// create a function that removes a classrom from a classrom_id
+async function removeClassroom(classroom_id){
+	return pool.query(`
+		DELETE FROM CLASSROOM WHERE id = $1`,
+		 [classroom_id]
+	).then((response) => {
+		return "Classroom removed from user!"
+	}).catch((error) => {
+		return new Error(error);
+	})
+}
+
+async function editClassroomFromAccount(account_email, new_classroom_name, new_number_of_seats){
+	return pool.query(`
+		UPDATE CLASSROOM
+			SET name = $1, number_of_seats = $2
+		FROM CLASSROOMS_ACCOUNT
+		WHERE CLASSROOMS_ACCOUNT.fk_account_id = (SELECT id FROM ACCOUNT WHERE email = $3)
+		AND CLASSROOMS_ACCOUNT.fk_classroom_id = CLASSROOM.id`,
+		 [new_classroom_name, new_number_of_seats, account_email]
+	).then((response) => {
+		return "Classroom edited from user!"
+	}).catch((error) => {
+		console.log(error);
+		return new Error(error);
+	})
+};
+
+async function getClassroomsFromAccount(account_email){
+	return pool.query(`
+		SELECT CLASSROOM.name, CLASSROOM.number_of_seats
+		FROM CLASSROOM, CLASSROOMS_ACCOUNT
+		WHERE CLASSROOMS_ACCOUNT.fk_account_id = (SELECT id FROM ACCOUNT WHERE email = ($1))
+		AND CLASSROOMS_ACCOUNT.fk_classroom_id = CLASSROOM.id`,
+		 [account_email]
+	).then((response) => {
+		return response.rows;
+	}).catch((error) => {
+		return new Error(error);
+	})
+};
+
+async function removeCourse(course_id){
+	return pool.query(`
+		DELETE FROM COURSE WHERE id = $1`,
+		 [course_id]
+	).then((response) => {
+		return "Course removed from user!"
+	}).catch((error) => {
+		return new Error(error);
+	})
+};
+
+async function getCourseIdFromAccount(account_email, course_name, course_class_number){
+	return pool.query(`
+		SELECT COURSE.id FROM COURSE
+		WHERE COURSE.name = $1
+		AND COURSE.class_number = $2
+		AND COURSE.id IN (SELECT fk_course_id FROM COURSES_ACCOUNT WHERE fk_account_id = (SELECT id FROM ACCOUNT WHERE email = $3))`,
+		 [course_name, course_class_number, account_email]
+	).then((response) => {
+		return response.rows[0].id;
+	}).catch((error) => {
+		return new Error(error);
+	})
+};
+
 module.exports = {
 	getUsers,
 	getUser,
+	getCoursesFromAccount,
 	createUser,
-	deleteUser,
 	isCorrectPassword,
-	changePassword
-}
+	changePassword,
+	addCourse,
+	addCourseToAccount,
+	removeCourseFromAccount,
+	editCourseFromAccount,
+	addClassroom,
+	addClassroomToAccount,
+	removeClassroomFromAccount,
+	editClassroomFromAccount,
+	getClassroomsFromAccount,
+	getClassroomIdFromAccount,
+	removeClassroom,
+	removeCourse,
+	getCourseIdFromAccount,
+};

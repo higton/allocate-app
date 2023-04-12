@@ -29,26 +29,26 @@ export class LoginComponent implements OnInit {
   ngOnInit(): void {
   }
 
-  async login(username: String, password: String) {
+  async login(email: String, password: String) {
     this.showErrorMessage = '';
 
-    this.showErrorMessage = await this.checkIfUsernameExist(username);
+    this.showErrorMessage = await this.checkIfEmailExist(email);
 
     if(!this.showErrorMessage){
-      await this.authService.login(username, password).catch(error => {
+      await this.authService.login(email, password).catch(error => {
         this.showErrorMessage = this.authService.translateErrorMessage(error);
       });
     }
   }
 
-  async checkIfUsernameExist(username: String){
-      return  await this.authService.isUsernameExistent(username)
-      .then( (existUsername:any) => {
-        if(!existUsername) {
+  async checkIfEmailExist(email: String){
+      return  await this.authService.isEmailExistent(email)
+      .then((isEmailUsed:any) => {
+        if(!isEmailUsed) {
           return 'This account does not exist';
         }
       })
-      .catch( (error:any) => {
+      .catch((error:any) => {
         return this.authService.translateErrorMessage(error);
       })
   }

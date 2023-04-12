@@ -15,21 +15,37 @@ const secret = process.env.SECRET;
 let UserSchema = buildSchema(`
   type User {
     id: Int,
-    username: String,
+    email: String,
     password: String,
   }
+  type Course {
+    name: String,
+    class_number: Int,
+    number_of_students: Int,
+  }
+  type Classroom {
+    name: String,
+    number_of_seats: Int,
+  }
   type Query {
-    getUser(username: String!): User,
-    checkUsername(username: String!): Boolean,
+    getUser(email: String!): User,
+    checkEmail(email: String!): Boolean,
     getUserFromToken: User,
     getUsers: [User],
     checkToken: Boolean,
     isCorrectPassword(password: String!): Boolean,
+    getCoursesFromAccount(email: String!): [Course],
+    getClassroomsFromAccount(email: String!): [Classroom],
   }
   type Mutation {
-    addUser( username: String!, password: String!): String,
-    deleteUser(username: String!): String,
-    changePassword(username: String!, newPassword: String!): String,
+    addUser( email: String!, password: String!): String,
+    changePassword(email: String!, newPassword: String!): String,
+    addCourseToAccount(course_name: String!, course_class_number: Int!, course_number_of_students: Int!, account_email: String!): String,
+    removeCourseFromAccount(course_name: String!, course_class_number: Int!, account_email: String!): String,
+    editCourseFromAccount(account_email: String!, course_name: String!, course_class_number: Int!, course_number_of_students: Int!): String,
+    addClassroomToAccount(classroom_name: String!, classroom_number_of_seats: Int!, account_email: String!): String,
+    removeClassroomFromAccount(classroom_name: String!, account_email: String!): String,
+    editClassroomFromAccount(account_email: String!, classroom_name: String!, classroom_number_of_seats: Int!): String,
   }
 `);
 
@@ -70,8 +86,8 @@ const rootResolver = {
     return users
   },
 
-  checkUsername: async ({ username }, req) => {
-    const user = await db.getUser(username)
+  checkEmail: async ({ email }, req) => {
+    const user = await db.getUser(email)
     if(user){
       return true;
     } else {
@@ -79,9 +95,9 @@ const rootResolver = {
     }
   },
 
-  getUser: async ({ username }, req) => {
+  getUser: async ({ email }, req) => {
     let userData = await checkToken(req);
-    const user = await db.getUser(username)
+    const user = await db.getUser(email)
     return user;
   },
 
@@ -97,38 +113,20 @@ const rootResolver = {
       });
     
     let user = {
-      username: userData.username,
+      email: userData.email,
     }
     return user;
   },
 
-  addUser: async ({ username, password }) => {
-    // print parameters
-    console.log('username: ', username);
-    console.log('password: ', password);
-
-    return await db.createUser({
-      username: username,
-      password: password,
-    })
+  getCoursesFromAccount: async ({email}, req) => {
+    return await db.getCoursesFromAccount(email);
   },
 
-  deleteUser: async ({ username }, req) => {
-    let userData = '';
-
-     await checkToken(req)
-    .then((result) => {
-      userData = result;
+  addUser: async ({ email, password }) => {
+    return await db.createUser({
+      email: email,
+      password: password,
     })
-    .catch((err) => {
-      return new Error("It is necessary to login")
-    });
-
-    if(userData){
-      return await db.deleteUser(username);
-    } else{
-      return new Error("It is necessary to login")
-    }
   },
 
   isCorrectPassword: async ({password}, req) => {
@@ -143,7 +141,7 @@ const rootResolver = {
     });
 
     if(userData && password){
-      return await db.isCorrectPassword(userData.username, password).then( (same, err) => {
+      return await db.isCorrectPassword(userData.email, password).then( (same, err) => {
         if (err) {
           return new Error('Internal error please try again');
         } else if (!same) {
@@ -155,8 +153,8 @@ const rootResolver = {
     }
   },
 
-  changePassword: async ({username, newPassword}, req) => {
-    return await db.changePassword(username, newPassword);
+  changePassword: async ({email, newPassword}, req) => {
+    return await db.changePassword(email, newPassword);
   },
 
   checkToken: (args, req) => {
@@ -166,6 +164,92 @@ const rootResolver = {
       return new Error("It is necessary to login")
     }
   },
+
+  addCourseToAccount: async ({ course_name, course_class_number, course_number_of_students, account_email }, req) => {
+    await checkToken(req)
+      .then((result) => {
+        userData = result;
+      })
+      .catch((err) => {
+        return new Error("It is necessary to login")
+      });
+    
+    await db.addCourse(course_name, course_class_number, course_number_of_students);
+
+    return await db.addCourseToAccount(account_email, course_name, course_class_number);
+  },
+
+  removeCourseFromAccount: async ({ account_email, course_name, course_class_number }, req) => {
+    await checkToken(req)
+      .then((result) => {
+        userData = result;
+      })
+      .catch((err) => {
+        return new Error("It is necessary to login")
+      });
+    
+    course_id = await db.getCourseIdFromAccount(account_email, course_name, course_class_number);
+    await db.removeCourseFromAccount(account_email, course_name, course_class_number);
+    return await db.removeCourse(course_id);
+  },
+
+  editCourseFromAccount: async ({ account_email, course_name, course_class_number,  course_number_of_students}, req) => {
+    await checkToken(req)
+      .then((result) => {
+        userData = result;
+      })
+      .catch((err) => {
+        return new Error("It is necessary to login")
+      });
+    
+    return await db.editCourseFromAccount(account_email, course_name, course_class_number, course_number_of_students);
+  },
+
+  addClassroomToAccount: async ({ classroom_name, classroom_number_of_seats, account_email }, req) => {
+    await checkToken(req)
+      .then((result) => {
+        userData = result;
+      })
+      .catch((err) => {
+        return new Error("It is necessary to login")
+      });
+    
+    await db.addClassroom(classroom_name, classroom_number_of_seats);
+
+    return await db.addClassroomToAccount(account_email, classroom_name, classroom_number_of_seats);
+  },
+
+  removeClassroomFromAccount: async ({ account_email, classroom_name }, req) => {
+    await checkToken(req)
+      .then((result) => {
+        userData = result;
+      })
+      .catch((err) => {
+        return new Error("It is necessary to login")
+      });
+    
+    classroom_id = await db.getClassroomIdFromAccount(account_email, classroom_name);
+    // print
+    console.log('classroom_id: ', classroom_id);
+    await db.removeClassroomFromAccount(account_email, classroom_id);
+    return await db.removeClassroom(classroom_id);
+  },
+
+  editClassroomFromAccount: async ({ account_email, classroom_name, classroom_number_of_seats }, req) => {
+    await checkToken(req)
+      .then((result) => {
+        userData = result;
+      })
+      .catch((err) => {
+        return new Error("It is necessary to login")
+      });
+    
+    return await db.editClassroomFromAccount(account_email, classroom_name, classroom_number_of_seats);
+  },
+
+  getClassroomsFromAccount: async ({email}, req) => {
+    return await db.getClassroomsFromAccount(email);
+  }
 }
 
 const loggingMiddleware = (req, res, next) => {
@@ -212,9 +296,9 @@ app.use('/graphql', graphqlHTTP({
 }));
 
 app.post('/api/authenticate', async function(req, res) {
-  const { username, password } = req.body;
+  const { email, password } = req.body;
 
-  db.getUser(username)
+  db.getUser(email)
     .then((result, err) => {
       if (err) {
         console.error(err);
@@ -222,9 +306,9 @@ app.post('/api/authenticate', async function(req, res) {
           .json({ error: 'Internal error please try again' });
       } else if (!result) {
         res.status(401)
-          .json({ error: 'Incorrect email or password1' });
+          .json({ error: 'Incorrect email or password' });
       } else {
-        db.isCorrectPassword(username, password).then( (same, err) => {
+        db.isCorrectPassword(email, password).then( (same, err) => {
           if (err) {
             res.status(500)
               .json({ error: 'Internal error please try again' });
@@ -233,7 +317,7 @@ app.post('/api/authenticate', async function(req, res) {
               .json({ error: 'Incorrect email or password2' });
           } else {
             // Issue token
-            const payload = { username };
+            const payload = { email };
             const token = jwt.sign(payload, secret, {
               expiresIn: '1d',
             });

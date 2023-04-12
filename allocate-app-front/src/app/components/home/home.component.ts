@@ -1,6 +1,8 @@
 import { Component, OnInit } from '@angular/core';
-import { fromEvent, of } from 'rxjs';
-import { filter, map, mergeMap, switchMap, concatMap } from 'rxjs/operators';
+
+import { AuthService } from '../../auth/services/auth.service';
+import { Course } from 'src/app/models/Course';
+import { Classroom } from 'src/app/models/Classroom';
 
 @Component({
   selector: 'app-home',
@@ -9,10 +11,25 @@ import { filter, map, mergeMap, switchMap, concatMap } from 'rxjs/operators';
 })
 export class HomeComponent implements OnInit {
 
-  constructor() { }
+  coursesList: Course[] = [];
+  classroomsList: Classroom[] = [];
+
+  constructor(public authService: AuthService) {}
 
   ngOnInit(): void {
-    const switched = of(2, 2, 3).pipe(switchMap((x: number) => of(x, x ** 2, x ** 3)));
-    switched.subscribe(x => console.log(x));
+    this.getCourses();
+    this.getClassrooms();
+  }
+
+  async getCourses(){
+    let email:String = await this.authService.getEmail();
+
+    this.coursesList = await this.authService.getCoursesFromAccount(email);
+  }
+
+  async getClassrooms(){
+    let email:String = await this.authService.getEmail();
+
+    this.classroomsList = await this.authService.getClassroomsFromAccount(email);
   }
 }

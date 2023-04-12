@@ -1,6 +1,5 @@
 <div id="container" class="in-center">
   <div id="login-container" class="in-center">
-    <img id="icon-image" src="../../assets/Pokeball.PNG">
     <div id="login-title">
      <h2>LOGIN</h2>
      <hr>
@@ -10,11 +9,11 @@
       {{showErrorMessage}}
       </div>
 
-        <input id="input-username" class="text-input"
-          #username
-          type="username"
-          name="username"
-          placeholder="Enter username"
+        <input id="input-email" class="text-input"
+          #email
+          type="email"
+          name="email"
+          placeholder="Enter email"
           required
         />
         <input id="input-password" class="text-input"
@@ -25,7 +24,7 @@
           required
         />
       <div id="button-container">
-        <button id="login-button" (click)="login(username.value, password.value)" *ngIf="!server.isLoggedIn">Login</button>
+        <button id="login-button" (click)="login(email.value, password.value)" *ngIf="!server.isLoggedIn">Login</button>
       </div>
     </div>
   </div>

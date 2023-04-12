@@ -15,9 +15,9 @@ export class ChangePasswordComponent implements OnInit {
   ngOnInit(): void {
   }
 
-  async changePassword(oldPassword, newPassword, reEnterPassword){
+  async changePassword(oldPassword: String, newPassword: String, reEnterPassword: String){
     this.showErrorMessage = '';
-    let username:any = await this.authService.getUsername();
+    let email:String = await this.authService.getEmail();
     let isCorrectPassword = false;
 
     if(newPassword !== reEnterPassword){
@@ -30,7 +30,7 @@ export class ChangePasswordComponent implements OnInit {
           if(!isCorrectPassword){
             this.showErrorMessage = 'Wrong password';
           } else {
-            this.authService.changePassword(username, newPassword)
+            this.authService.changePassword(email, newPassword)
             .then(result => {
               this.showSuccessMessage = 'Password changed successfully!';
             });

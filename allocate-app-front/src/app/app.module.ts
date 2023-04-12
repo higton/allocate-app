@@ -13,6 +13,8 @@ import { PageNotFoundComponent } from './components/page-not-found/page-not-foun
 import { HomeComponent } from './components/home/home.component';
 import { UserModule } from './user/user.module';
 import { AuthModule } from './auth/auth.module';
+import { CoursesComponent } from './courses/courses.component';
+import { ClassroomsComponent } from './components/classrooms/classrooms.component';
 
 @NgModule({
   declarations: [
@@ -20,6 +22,8 @@ import { AuthModule } from './auth/auth.module';
     HeaderComponent,
     PageNotFoundComponent,
     HomeComponent,
+    CoursesComponent,
+    ClassroomsComponent,
   ],
   imports: [
     BrowserAnimationsModule,

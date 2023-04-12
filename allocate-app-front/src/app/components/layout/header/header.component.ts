@@ -28,7 +28,7 @@ export class HeaderComponent implements OnInit {
   }
 
   async init(){
-    let username:any = await this.authService.getUsername();
+    let email:String = await this.authService.getEmail();
   }
 
   goToHomePage(){
