@@ -27,7 +27,6 @@ async function init(){
 		CREATE TABLE IF NOT EXISTS COURSE (
 			id SERIAL PRIMARY KEY,
 			name VARCHAR(30) NOT NULL,
-			class_number INT NOT NULL,
 			number_of_students INT NOT NULL
 		)
 		`, (res, err) => {
@@ -108,7 +107,7 @@ async function getUser(email){
 
 async function getCoursesFromAccount(email){
 	return pool.query(`
-		SELECT name, class_number, number_of_students FROM COURSES_ACCOUNT
+		SELECT name, number_of_students FROM COURSES_ACCOUNT
 		JOIN ACCOUNT ON ACCOUNT.id = fk_account_id
 		JOIN COURSE ON COURSE.id = fk_course_id
 		WHERE ACCOUNT.email = ($1)`,
@@ -178,10 +177,10 @@ async function changePassword(email, newPassword){
 	});
 };
 
-async function addCourse(name, class_number, number_of_students){
+async function addCourse(name, number_of_students){
 	return pool.query(
-		'INSERT INTO COURSE (name, class_number, number_of_students) VALUES ($1, $2, $3)',
-		 [name, class_number, number_of_students]
+		'INSERT INTO COURSE (name, number_of_students) VALUES ($1, $2)',
+		 [name, number_of_students]
 	)
 	.then((response) => {
 		return "Course added!"
@@ -190,14 +189,13 @@ async function addCourse(name, class_number, number_of_students){
 	})
 };
 
-async function addCourseToAccount(account_email, course_name, course_class_number){
+async function addCourseToAccount(account_email, course_name){
 	return pool.query(`
 		INSERT INTO COURSES_ACCOUNT (fk_account_id, fk_course_id)
 		SELECT ACCOUNT.id, COURSE.id FROM ACCOUNT, COURSE 
 		WHERE ACCOUNT.email = ($1)
-		AND COURSE.name = ($2)
-		AND COURSE.class_number = ($3)`,
-		 [account_email, course_name, course_class_number]
+		AND COURSE.name = ($2)`,
+		 [account_email, course_name]
 	).then((response) => {
 		return "Course added to user!"
 	}).catch((error) => {
@@ -205,12 +203,12 @@ async function addCourseToAccount(account_email, course_name, course_class_numbe
 	})
 };
 
-async function removeCourseFromAccount(account_email, course_name, course_class_number){
+async function removeCourseFromAccount(account_email, course_name){
 	return pool.query(`
 		DELETE FROM COURSES_ACCOUNT
 		WHERE fk_account_id IN (SELECT id FROM ACCOUNT WHERE email = $1)
-		AND fk_course_id IN (SELECT id FROM COURSE WHERE name = $2 AND class_number = $3)`,
-		 [account_email, course_name, course_class_number]
+		AND fk_course_id IN (SELECT id FROM COURSE WHERE name = $2)`,
+		 [account_email, course_name]
 	).then((response) => {
 		return "Course removed from user!"
 	}).catch((error) => {
@@ -218,16 +216,14 @@ async function removeCourseFromAccount(account_email, course_name, course_class_
 	})
 };
 
-async function editCourseFromAccount(account_email, new_course_name, new_course_class_number, new_number_of_students){
-	// print all parameters
-	console.log('parameters: ', account_email, new_course_name, new_course_class_number, new_number_of_students);
+async function editCourseFromAccount(account_email, new_course_name, new_number_of_students){
 	return pool.query(`
 		UPDATE COURSE 
-			SET name = $1, class_number = $2, number_of_students = $3
+			SET name = $1, number_of_students = $2
 		FROM COURSES_ACCOUNT
-		WHERE COURSES_ACCOUNT.fk_account_id = (SELECT id FROM ACCOUNT WHERE email = $4)
+		WHERE COURSES_ACCOUNT.fk_account_id = (SELECT id FROM ACCOUNT WHERE email = $3)
 		AND COURSES_ACCOUNT.fk_course_id = COURSE.id`,
-		 [new_course_name, new_course_class_number, new_number_of_students, account_email]
+		 [new_course_name, new_number_of_students, account_email]
 	).then((response) => {
 		return "Course edited from user!"
 	}).catch((error) => {
@@ -343,13 +339,12 @@ async function removeCourse(course_id){
 	})
 };
 
-async function getCourseIdFromAccount(account_email, course_name, course_class_number){
+async function getCourseIdFromAccount(account_email, course_name){
 	return pool.query(`
 		SELECT COURSE.id FROM COURSE
 		WHERE COURSE.name = $1
-		AND COURSE.class_number = $2
-		AND COURSE.id IN (SELECT fk_course_id FROM COURSES_ACCOUNT WHERE fk_account_id = (SELECT id FROM ACCOUNT WHERE email = $3))`,
-		 [course_name, course_class_number, account_email]
+		AND COURSE.id IN (SELECT fk_course_id FROM COURSES_ACCOUNT WHERE fk_account_id = (SELECT id FROM ACCOUNT WHERE email = $2))`,
+		 [course_name, account_email]
 	).then((response) => {
 		return response.rows[0].id;
 	}).catch((error) => {

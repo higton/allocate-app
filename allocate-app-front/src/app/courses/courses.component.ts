@@ -22,7 +22,6 @@ export class CoursesComponent implements OnInit {
   ngOnInit(): void {
     this.newCourse = {
       name: '',
-      class_number: 0,
       number_of_students: 0,
     };
   }
@@ -30,8 +29,8 @@ export class CoursesComponent implements OnInit {
   async addCourseToAccount() {
     let account_email:String = await this.authService.getEmail();
 
-    if (this.newCourse.name && this.newCourse.class_number && this.newCourse.number_of_students) {
-      await this.authService.addCourseToAccount(this.newCourse.name, this.newCourse.class_number, this.newCourse.number_of_students, account_email)
+    if (this.newCourse.name && this.newCourse.number_of_students) {
+      await this.authService.addCourseToAccount(this.newCourse.name, this.newCourse.number_of_students, account_email)
         .then((result) => {
           // Append the new course to the list of courses
           this.coursesList.push(this.newCourse);
@@ -39,7 +38,6 @@ export class CoursesComponent implements OnInit {
 
       this.newCourse = {
         name: '',
-        class_number: 0,
         number_of_students: 0,
       };
     }
@@ -48,11 +46,11 @@ export class CoursesComponent implements OnInit {
   async removeItem(course: Course) {
     let account_email:String = await this.authService.getEmail();
 
-    await this.authService.removeCourseFromAccount(course.name, course.class_number, account_email)
+    await this.authService.removeCourseFromAccount(course.name, account_email)
       .then((result) => {
         // Remove the course from the list of courses
         this.coursesList = this.coursesList.filter((item) => {
-          return item.name !== course.name && item.class_number !== course.class_number;
+          return item.name !== course.name;
         });
       });
   }
@@ -77,11 +75,11 @@ export class CoursesComponent implements OnInit {
 
     let account_email:String = await this.authService.getEmail();
 
-    this.authService.editCourseFromAccount(account_email, this.editedCourse.name, this.editedCourse.class_number, this.editedCourse.number_of_students)
+    this.authService.editCourseFromAccount(account_email, this.editedCourse.name, this.editedCourse.number_of_students)
       .then((result) => {
         // Update the course in the list of courses
         this.coursesList = this.coursesList.map((course) => {
-          if (course.name === this.editedCourse.name && course.class_number === this.editedCourse.class_number) {
+          if (course.name === this.editedCourse.name) {
             return this.editedCourse;
           } else {
             return course;

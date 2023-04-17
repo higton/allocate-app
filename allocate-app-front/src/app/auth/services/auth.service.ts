@@ -269,16 +269,16 @@ export class AuthService {
     });
   }
 
-  addCourseToAccount(course_name: String, course_class_number: Number, course_number_of_students: Number, account_email: String){
-    let query = `mutation addCourseToAccount($course_name: String!, $course_class_number: Int!, $course_number_of_students: Int!, $account_email: String!) {
-      addCourseToAccount(course_name: $course_name, course_class_number: $course_class_number, course_number_of_students: $course_number_of_students, account_email: $account_email)
+  addCourseToAccount(course_name: String, course_number_of_students: Number, account_email: String){
+    let query = `mutation addCourseToAccount($course_name: String!, $course_number_of_students: Int!, $account_email: String!) {
+      addCourseToAccount(course_name: $course_name, course_number_of_students: $course_number_of_students, account_email: $account_email)
     }`;
 
     return new Promise<void>((resolve, reject) => {
       this.server.request('POST', '/graphql',
         JSON.stringify({
           query,
-          variables: { course_name, course_class_number, course_number_of_students, account_email },
+          variables: { course_name, course_number_of_students, account_email },
         })
       ).subscribe((response: any) => {
         console.log('response', response);
@@ -296,7 +296,6 @@ export class AuthService {
       query getCoursesFromAccount($email: String!){
         getCoursesFromAccount(email: $email) {
           name,
-          class_number,
           number_of_students
         }
       }
@@ -319,10 +318,10 @@ export class AuthService {
     });
   }
 
-  removeCourseFromAccount(course_name: String, course_class_number: Number, account_email: String){
+  removeCourseFromAccount(course_name: String, account_email: String){
     const query = `
-      mutation removeCourseFromAccount($course_name: String!, $course_class_number: Int!, $account_email: String!) {
-        removeCourseFromAccount(course_name: $course_name, course_class_number: $course_class_number, account_email: $account_email)
+      mutation removeCourseFromAccount($course_name: String!, $account_email: String!) {
+        removeCourseFromAccount(course_name: $course_name, account_email: $account_email)
       }
     `;
 
@@ -330,7 +329,7 @@ export class AuthService {
       this.server.request('POST', '/graphql',
         JSON.stringify({
           query,
-          variables: { course_name, course_class_number, account_email },
+          variables: { course_name, account_email },
         })
       ).subscribe((response: any) => {
         console.log('response', response);
@@ -343,11 +342,10 @@ export class AuthService {
     });
   }
 
-  // create function fro this query editCourseFromAccount(account_email: String!, course_name: String!, course_class_number: Int!, course_number_of_students: Int!}: String,
-  editCourseFromAccount(account_email: String, course_name: String, course_class_number: Number, course_number_of_students: Number){
+  editCourseFromAccount(account_email: String, course_name: String, course_number_of_students: Number){
     const query = `
-      mutation editCourseFromAccount($account_email: String!, $course_name: String!, $course_class_number: Int!, $course_number_of_students: Int!) {
-        editCourseFromAccount(account_email: $account_email, course_name: $course_name, course_class_number: $course_class_number, course_number_of_students: $course_number_of_students)
+      mutation editCourseFromAccount($account_email: String!, $course_name: String!, $course_number_of_students: Int!) {
+        editCourseFromAccount(account_email: $account_email, course_name: $course_name, course_number_of_students: $course_number_of_students)
       }
     `;
 
@@ -355,7 +353,7 @@ export class AuthService {
       this.server.request('POST', '/graphql',
         JSON.stringify({
           query,
-          variables: { account_email, course_name, course_class_number, course_number_of_students },
+          variables: { account_email, course_name, course_number_of_students },
         })
       ).subscribe((response: any) => {
         console.log('response', response);

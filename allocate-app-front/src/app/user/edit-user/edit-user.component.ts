@@ -22,7 +22,6 @@ export class EditUserComponent implements OnInit {
   ngOnInit(): void {
     this.newCourse = {
       name: '',
-      class_number: 0,
       number_of_students: 0,
     };
   }
@@ -30,15 +29,14 @@ export class EditUserComponent implements OnInit {
   async addCourseToAccount() {
     let account_email:String = await this.authService.getEmail();
 
-    if (this.newCourse.name && this.newCourse.class_number && this.newCourse.number_of_students) {
-      await this.authService.addCourseToAccount(this.newCourse.name, this.newCourse.class_number, this.newCourse.number_of_students, account_email)
+    if (this.newCourse.name && this.newCourse.number_of_students) {
+      await this.authService.addCourseToAccount(this.newCourse.name, this.newCourse.number_of_students, account_email)
         .then((result) => {
           this.coursesList.push(this.newCourse);
         });
 
       this.newCourse = {
         name: '',
-        class_number: 0,
         number_of_students: 0,
       };
     }
@@ -47,7 +45,7 @@ export class EditUserComponent implements OnInit {
   async removeItem(course: Course) {
     let account_email:String = await this.authService.getEmail();
 
-    await this.authService.removeCourseFromAccount(course.name, course.class_number, account_email)
+    await this.authService.removeCourseFromAccount(course.name, account_email)
       .then((result) => {
         this.coursesList = this.coursesList.filter((item) => {
           return item.name !== course.name;
@@ -74,7 +72,7 @@ export class EditUserComponent implements OnInit {
     
     let account_email:String = await this.authService.getEmail();
 
-    this.authService.editCourseFromAccount(account_email, this.editedCourse.name, this.editedCourse.class_number, this.editedCourse.number_of_students)
+    this.authService.editCourseFromAccount(account_email, this.editedCourse.name, this.editedCourse.number_of_students)
       .then((result) => {
         // update course in coursesList array
         this.coursesList = this.coursesList.map((item) => {
