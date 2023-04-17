@@ -1,6 +1,11 @@
 <div class="container-home">
-    <app-courses [coursesList]="coursesList"></app-courses>
+    <h2>Courses</h2>
+    <app-courses (next)="handleNextCourse($event)"></app-courses>
     <h2>Classrooms</h2>
-    <app-classrooms [classroomsList]="classroomsList"></app-classrooms>
+    <app-classrooms (next)="handleNextClassroom($event)"></app-classrooms>
     <h2>Result</h2>
+    <!-- iterate over results.courses -->
+    <div *ngFor="let course of results.courses">
+        <h3>{{course.name}} - {{course.number_of_students}}</h3>
+    </div>
 </div>

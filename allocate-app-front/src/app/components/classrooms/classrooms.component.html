@@ -1,22 +1,23 @@
 <ul>
-    <li *ngFor="let item of classroomsList; let i = index">
-      {{ item.name }} - {{ item.number_of_seats }} students
-      <button (click)="startEditing(item)">Edit</button>
-      <button (click)="removeItem(item)">Remove</button>
-      <div *ngIf="item === selectedClassroom">
-        <form (submit)="editClassroom()">
-          <input type="text" [(ngModel)]="editedClassroom.name" name="name" placeholder="Name">
-          <input type="number" [(ngModel)]="editedClassroom.number_of_seats" name="number_of_seats" placeholder="Number of Seats">
-          <button type="submit">Save</button>
-          <button type="button" (click)="cancelEditing()">Cancel</button>
-        </form>
-      </div>
-    </li>
-  </ul>
+  <li *ngFor="let item of userService.classroomsList; let i = index">
+    {{ item.name }} - {{ item.number_of_seats }} students
+    <button (click)="startEditing(item)">Edit</button>
+    <button (click)="removeItem(item)">Remove</button>
+    <div *ngIf="item === selectedClassroom">
+      <form (submit)="editClassroom(item)">
+        <input type="text" [(ngModel)]="editedClassroom.name" name="name" placeholder="Name">
+        <input type="number" [(ngModel)]="editedClassroom.number_of_seats" name="number_of_seats" placeholder="Number of Seats">
+        <button type="submit">Save</button>
+        <button type="button" (click)="cancelEditing()">Cancel</button>
+      </form>
+    </div>
+  </li>
+</ul>
   
-  <div>
-    <input type="text" [(ngModel)]="newClassroom.name" placeholder="Name">
-    <input type="number" [(ngModel)]="newClassroom.number_of_seats" placeholder="Number of Seats">
-    <button (click)="addClassroomToAccount()">Add Classroom</button>
-  </div>
-  
+<div>
+  <input type="text" [(ngModel)]="newClassroom.name" placeholder="Name">
+  <input type="number" [(ngModel)]="newClassroom.number_of_seats" placeholder="Number of Seats">
+  <button (click)="addClassroomToAccount()">Add Classroom</button>
+</div>
+
+<button (click)="goNext()">Next!</button>

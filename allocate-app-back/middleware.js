@@ -11,7 +11,7 @@ function withAuth (req, res, next) {
 	if(req.headers.authorization){
 		token = req.headers.authorization.split(' ')[1];
 	}
-	console.log('token', token);
+
 	if (token === '') {
 		res.status(401).send('Unauthorized: No token provided');
 	} else {
@@ -19,7 +19,6 @@ function withAuth (req, res, next) {
 			if (err) {
 				res.status(401).send('Unauthorized: Invalid token');
 			} else {
-				console.log('decoded11111', decoded);
 				res.username = decoded.username;
 				next();
 			}

@@ -1,6 +1,7 @@
-import { Component, Input, OnInit } from '@angular/core';
+import { Component, EventEmitter, Input, OnInit, Output } from '@angular/core';
 
 import { AuthService } from '../auth/services/auth.service';
+import { UserService } from '../services/user.service';
 import { Course } from 'src/app/models/Course';
 
 @Component({
@@ -9,13 +10,14 @@ import { Course } from 'src/app/models/Course';
   styleUrls: ['./courses.component.css']
 })
 export class CoursesComponent implements OnInit {
-  @Input() coursesList:Course[];
+  @Output() next = new EventEmitter();
 
   newCourse: Course;
   selectedCourse: Course;
   editedCourse: Course | null = null;
 
   constructor(
+    public userService: UserService,
     public authService: AuthService,
   ) { }
 
@@ -27,14 +29,10 @@ export class CoursesComponent implements OnInit {
   }
 
   async addCourseToAccount() {
-    let account_email:String = await this.authService.getEmail();
+    let account_email = await this.authService.getEmail();
 
     if (this.newCourse.name && this.newCourse.number_of_students) {
-      await this.authService.addCourseToAccount(this.newCourse.name, this.newCourse.number_of_students, account_email)
-        .then((result) => {
-          // Append the new course to the list of courses
-          this.coursesList.push(this.newCourse);
-        });
+      await this.userService.addCourseToAccount(this.newCourse.name, this.newCourse.number_of_students, account_email.toString());
 
       this.newCourse = {
         name: '',
@@ -46,13 +44,7 @@ export class CoursesComponent implements OnInit {
   async removeItem(course: Course) {
     let account_email:String = await this.authService.getEmail();
 
-    await this.authService.removeCourseFromAccount(course.name, account_email)
-      .then((result) => {
-        // Remove the course from the list of courses
-        this.coursesList = this.coursesList.filter((item) => {
-          return item.name !== course.name;
-        });
-      });
+    await this.userService.removeCourseFromAccount(course.name, account_email);
   }
 
   startEditing(course: Course) {
@@ -69,22 +61,15 @@ export class CoursesComponent implements OnInit {
     this.selectedCourse = null;
   }
 
-  async editCourse() {
+  async editCourse(course: Course) {
     this.selectedCourse = null;
-    
 
     let account_email:String = await this.authService.getEmail();
 
-    this.authService.editCourseFromAccount(account_email, this.editedCourse.name, this.editedCourse.number_of_students)
-      .then((result) => {
-        // Update the course in the list of courses
-        this.coursesList = this.coursesList.map((course) => {
-          if (course.name === this.editedCourse.name) {
-            return this.editedCourse;
-          } else {
-            return course;
-          }
-        });
-      });
+    this.userService.editCourseFromAccount(account_email, course, this.editedCourse);
+  }
+
+  goNext() {
+    this.next.emit();
   }
 }

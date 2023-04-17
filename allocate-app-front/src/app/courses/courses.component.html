@@ -1,10 +1,10 @@
 <ul>
-  <li *ngFor="let item of coursesList; let i = index">
+  <li *ngFor="let item of userService.coursesList; let i = index">
     {{ item.name }} - {{ item.number_of_students }} students
     <button (click)="startEditing(item)">Edit</button>
     <button (click)="removeItem(item)">Remove</button>
     <div *ngIf="item === selectedCourse">
-      <form (submit)="editCourse()">
+      <form (submit)="editCourse(item)">
         <input type="text" [(ngModel)]="editedCourse.name" name="name" placeholder="Name">
         <input type="number" [(ngModel)]="editedCourse.number_of_students" name="number_of_students" placeholder="Number of Students">
         <button type="submit">Save</button>
@@ -19,3 +19,5 @@
   <input type="number" [(ngModel)]="newCourse.number_of_students" placeholder="Number of Students">
   <button (click)="addCourseToAccount()">Add Course</button>
 </div>
+
+<button (click)="goNext()">Next!</button>

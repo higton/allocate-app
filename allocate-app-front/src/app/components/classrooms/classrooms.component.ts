@@ -1,6 +1,7 @@
-import { Component, Input, OnInit } from '@angular/core';
+import { Component, EventEmitter, Input, OnInit, Output } from '@angular/core';
 
 import { AuthService } from 'src/app/auth/services/auth.service';
+import { UserService } from '../../services/user.service';
 import { Classroom } from 'src/app/models/Classroom';
 
 @Component({
@@ -9,13 +10,14 @@ import { Classroom } from 'src/app/models/Classroom';
   styleUrls: ['./classrooms.component.css']
 })
 export class ClassroomsComponent implements OnInit {
-  @Input() classroomsList:Classroom[];
-
+  @Output() next = new EventEmitter();
+  
   newClassroom: Classroom;
   selectedClassroom: Classroom;
   editedClassroom: Classroom | null = null;
 
   constructor(
+    public userService: UserService,
     public authService: AuthService,
   ) { }
 
@@ -30,10 +32,8 @@ export class ClassroomsComponent implements OnInit {
     let account_email:String = await this.authService.getEmail();
 
     if (this.newClassroom.name && this.newClassroom.number_of_seats) {
-      await this.authService.addClassroomToAccount(this.newClassroom.name, this.newClassroom.number_of_seats, account_email)
-        .then((result) => {
-          this.classroomsList.push(this.newClassroom);
-        });
+      console.log("Adding classroom to account: " + account_email.toString());
+      await this.userService.addClassroomToAccount(this.newClassroom, account_email.toString());
 
       this.newClassroom = {
         name: '',
@@ -45,12 +45,7 @@ export class ClassroomsComponent implements OnInit {
   async removeItem(classroom: Classroom) {
     let account_email:String = await this.authService.getEmail();
 
-    await this.authService.removeClassroomFromAccount(classroom.name, account_email)
-      .then((result) => {
-        this.classroomsList = this.classroomsList.filter((item) => {
-          return item.name !== classroom.name;
-        });
-      });
+    await this.userService.removeClassroomFromAccount(classroom.name, account_email);
   }
 
   startEditing(classroom: Classroom) {
@@ -67,20 +62,15 @@ export class ClassroomsComponent implements OnInit {
     this.selectedClassroom = null;
   }
 
-  async editClassroom() {
+  async editClassroom(classroom: Classroom) {
     this.selectedClassroom = null;
     
     let account_email:String = await this.authService.getEmail();
 
-    this.authService.editClassroomFromAccount(this.editedClassroom.name, this.editedClassroom.number_of_seats, account_email)
-      .then((result) => {
-        // update classroom in classroomsList array
-        this.classroomsList = this.classroomsList.map((item) => {
-          if (item.name === this.editedClassroom.name) {
-            return this.editedClassroom;
-          }
-          return item;
-        });
-      });
+    this.userService.editClassroomFromAccount(classroom, this.editedClassroom, account_email);
+  }
+
+  goNext() {
+    this.next.emit();
   }
 }
