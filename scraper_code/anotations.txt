@@ -1,0 +1,15 @@
+Prototype plan:
+- Create a scraper that collects the informations and returns a file with the informations collected
+    - Number of students registered
+- Create some real or mocked scraper's generated files to use as a test
+    - Number of students registered in EDA 1
+- Create a simple login system for the project
+    - With a change password system
+- Create a functionality where the user can insert the courses and the number of students currently registered
+    - Can edit this information manually
+    - Can upload a file with the informations
+    - Can ask the scraper to get this information (this is optional, first check whether this is possible)
+- Get an external allocation algorithm and integrate with the system
+- Show the allocated classrooms. (final result)
+
+
