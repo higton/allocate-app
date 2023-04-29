@@ -23,36 +23,38 @@ export class UserService {
     return this.subjectProfilePicture.asObservable();
   }
 
-  addCourseToAccount(course_name: string, course_number_of_students: number, account_email: string){
-    // if course already exists, do not add it again
-    if (this.coursesList.find((course) => course.name === course_name)) {
-      return;
-    }
-
-    let query = `mutation addCourseToAccount($course_name: String!, $course_number_of_students: Int!, $account_email: String!) {
-      addCourseToAccount(course_name: $course_name, course_number_of_students: $course_number_of_students, account_email: $account_email)
-    }`;
-
+  addCourseToAccount(new_course: Course, account_email: String){
+    const query = `
+      mutation addCourseToAccount($name: String!, $professor: String!, $group_period: String!, $department: String!, $localthreshold: Int!, $time_slot: String!, $account_email: String!) {
+        addCourseToAccount(name: $name, professor: $professor, group_period: $group_period, department: $department, localthreshold: $localthreshold, time_slot: $time_slot, account_email: $account_email)
+      }
+    `;
+    
     return new Promise<void>((resolve, reject) => {
       this.server.request('POST', '/graphql',
         JSON.stringify({
           query,
-          variables: { course_name, course_number_of_students, account_email },
+          variables: {
+            name: new_course.name,
+            professor: new_course.professor,
+            group_period: new_course.group_period,
+            department: new_course.department,
+            localthreshold: new_course.localthreshold,
+            time_slot: new_course.time_slot,
+            account_email,
+          },
         })
       ).subscribe((response: any) => {
         console.log('response', response);
-        
-        this.coursesList.push({
-          name: course_name,
-          number_of_students: course_number_of_students,
-        });
+
+        // add course to coursesList
+        this.coursesList.push(new_course);
 
         resolve();
-      },
-      (err) => { 
+      }, (err) => {
         console.log('error', err);
         reject(err);
-      })
+      });
     });
   }
 
@@ -61,7 +63,11 @@ export class UserService {
       query getCoursesFromAccount($email: String!){
         getCoursesFromAccount(email: $email) {
           name,
-          number_of_students
+          professor,
+          group_period,
+          department,
+          localthreshold,
+          time_slot,
         }
       }
     `;
@@ -113,10 +119,13 @@ export class UserService {
     });
   }
 
-  editCourseFromAccount(account_email: String, course: Course, editedCourse: Course){
+  //     editCourseFromAccount(account_email: String!, course_name: String!, new_course_name: String!, new_professor: String!, new_group_period: String!, new_department: String!, new_localthreshold: Int!, new_time_slot: String!): String,
+  editCourseFromAccount(newCourse: Course, account_email: String, oldCourseName: String) {
+    // print newCourse
+    console.log('newCourse', newCourse);
     const query = `
-      mutation editCourseFromAccount($account_email: String!, $course_name: String!, $course_number_of_students: Int!) {
-        editCourseFromAccount(account_email: $account_email, course_name: $course_name, course_number_of_students: $course_number_of_students)
+      mutation editCourseFromAccount($course_name: String!, $new_course_name: String!, $new_professor: String!, $new_group_period: String!, $new_department: String!, $new_localthreshold: Int!, $new_time_slot: String!, $account_email: String!) {
+        editCourseFromAccount(course_name: $course_name, new_course_name: $new_course_name, new_professor: $new_professor, new_group_period: $new_group_period, new_department: $new_department, new_localthreshold: $new_localthreshold, new_time_slot: $new_time_slot, account_email: $account_email)
       }
     `;
 
@@ -124,15 +133,24 @@ export class UserService {
       this.server.request('POST', '/graphql',
         JSON.stringify({
           query,
-          variables: { account_email, course_name: course.name, course_number_of_students: editedCourse.number_of_students },
+          variables: {
+            course_name: oldCourseName,
+            new_course_name: newCourse.name,
+            new_professor: newCourse.professor,
+            new_group_period: newCourse.group_period,
+            new_department: newCourse.department,
+            new_localthreshold: newCourse.localthreshold,
+            new_time_slot: newCourse.time_slot,
+            account_email,
+          },
         })
       ).subscribe((response: any) => {
         console.log('response', response);
 
         // update course in coursesList
         this.coursesList = this.coursesList.map((course) => {
-          if (course.name === course.name) {
-            return editedCourse;
+          if (course.name === oldCourseName) {
+            return newCourse;
           }
           return course;
         });

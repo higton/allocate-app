@@ -24,19 +24,27 @@ export class CoursesComponent implements OnInit {
   ngOnInit(): void {
     this.newCourse = {
       name: '',
-      number_of_students: 0,
+      professor: '',
+      group_period: '',
+      department: '',
+      localthreshold: 0,
+      time_slot: '',
     };
   }
 
   async addCourseToAccount() {
     let account_email = await this.authService.getEmail();
 
-    if (this.newCourse.name && this.newCourse.number_of_students) {
-      await this.userService.addCourseToAccount(this.newCourse.name, this.newCourse.number_of_students, account_email.toString());
+    if (this.newCourse.name && this.newCourse.professor && this.newCourse.group_period && this.newCourse.department && this.newCourse.localthreshold && this.newCourse.time_slot) {
+      await this.userService.addCourseToAccount(this.newCourse, account_email);
 
       this.newCourse = {
         name: '',
-        number_of_students: 0,
+        professor: '',
+        group_period: '',
+        department: '',
+        localthreshold: 0,
+        time_slot: '',
       };
     }
   }
@@ -66,7 +74,7 @@ export class CoursesComponent implements OnInit {
 
     let account_email:String = await this.authService.getEmail();
 
-    this.userService.editCourseFromAccount(account_email, course, this.editedCourse);
+    this.userService.editCourseFromAccount(this.editedCourse, account_email, course.name);
   }
 
   goNext() {

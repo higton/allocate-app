@@ -1,12 +1,16 @@
 <ul>
   <li *ngFor="let item of userService.coursesList; let i = index">
-    {{ item.name }} - {{ item.number_of_students }} students
+    {{ item.name }} - {{ item.professor }} - {{ item.group_period }} - {{ item.department }} - {{ item.localthreshold }} - {{ item.time_slot }}
     <button (click)="startEditing(item)">Edit</button>
     <button (click)="removeItem(item)">Remove</button>
     <div *ngIf="item === selectedCourse">
       <form (submit)="editCourse(item)">
         <input type="text" [(ngModel)]="editedCourse.name" name="name" placeholder="Name">
-        <input type="number" [(ngModel)]="editedCourse.number_of_students" name="number_of_students" placeholder="Number of Students">
+        <input type="text" [(ngModel)]="editedCourse.professor" name="professor" placeholder="Professor">
+        <input type="text" [(ngModel)]="editedCourse.group_period" name="group_period" placeholder="Group Period">
+        <input type="text" [(ngModel)]="editedCourse.department" name="department" placeholder="Department">
+        <input type="number" [(ngModel)]="editedCourse.localthreshold" name="localthreshold" placeholder="Local Threshold">
+        <input type="text" [(ngModel)]="editedCourse.time_slot" name="time_slot" placeholder="Time Slot">
         <button type="submit">Save</button>
         <button type="button" (click)="cancelEditing()">Cancel</button>
       </form>
@@ -16,7 +20,11 @@
 
 <div>
   <input type="text" [(ngModel)]="newCourse.name" placeholder="Name">
-  <input type="number" [(ngModel)]="newCourse.number_of_students" placeholder="Number of Students">
+  <input type="text" [(ngModel)]="newCourse.professor" placeholder="Professor">
+  <input type="text" [(ngModel)]="newCourse.group_period" placeholder="Group Period">
+  <input type="text" [(ngModel)]="newCourse.department" placeholder="Department">
+  <input type="number" [(ngModel)]="newCourse.localthreshold" placeholder="Local Threshold">
+  <input type="text" [(ngModel)]="newCourse.time_slot" placeholder="Time Slot">
   <button (click)="addCourseToAccount()">Add Course</button>
 </div>
 

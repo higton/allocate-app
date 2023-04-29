@@ -1,4 +1,8 @@
 export class Course {
-    name: string;
-    number_of_students: number;
+    name: String;
+    professor: String;
+    group_period: String;
+    department: String;
+    localthreshold: Number;
+    time_slot: String;
 }
