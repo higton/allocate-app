@@ -1,8 +1,8 @@
 export class Course {
     name: String;
     professor: String;
-    group_period: String;
+    groupPeriod: String;
     department: String;
     localthreshold: Number;
-    time_slot: String;
+    timeSlots: String;
 }

@@ -15,6 +15,7 @@ import { UserModule } from './user/user.module';
 import { AuthModule } from './auth/auth.module';
 import { CoursesComponent } from './courses/courses.component';
 import { ClassroomsComponent } from './components/classrooms/classrooms.component';
+import { TimetableComponent } from './components/timetable/timetable.component';
 
 @NgModule({
   declarations: [
@@ -24,6 +25,7 @@ import { ClassroomsComponent } from './components/classrooms/classrooms.componen
     HomeComponent,
     CoursesComponent,
     ClassroomsComponent,
+    TimetableComponent,
   ],
   imports: [
     BrowserAnimationsModule,

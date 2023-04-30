@@ -3,6 +3,7 @@ import { Component, EventEmitter, Input, OnInit, Output } from '@angular/core';
 import { AuthService } from '../auth/services/auth.service';
 import { UserService } from '../services/user.service';
 import { Course } from 'src/app/models/Course';
+import SigaaHelper from 'src/util/sigaa';
 
 @Component({
   selector: 'app-courses',
@@ -15,6 +16,7 @@ export class CoursesComponent implements OnInit {
   newCourse: Course;
   selectedCourse: Course;
   editedCourse: Course | null = null;
+  showTable: boolean = false;
 
   constructor(
     public userService: UserService,
@@ -25,26 +27,29 @@ export class CoursesComponent implements OnInit {
     this.newCourse = {
       name: '',
       professor: '',
-      group_period: '',
+      groupPeriod: '',
       department: '',
       localthreshold: 0,
-      time_slot: '',
+      timeSlots: '',
     };
   }
 
   async addCourseToAccount() {
+    console.log("grupo do horario: ", SigaaHelper.calculateFromhorario(this.newCourse.groupPeriod));
+    console.log("horario: ", this.newCourse.timeSlots.split(","));
+
     let account_email = await this.authService.getEmail();
 
-    if (this.newCourse.name && this.newCourse.professor && this.newCourse.group_period && this.newCourse.department && this.newCourse.localthreshold && this.newCourse.time_slot) {
+    if (this.newCourse.name && this.newCourse.professor && this.newCourse.groupPeriod && this.newCourse.department && this.newCourse.localthreshold && this.newCourse.timeSlots) {
       await this.userService.addCourseToAccount(this.newCourse, account_email);
 
       this.newCourse = {
         name: '',
         professor: '',
-        group_period: '',
+        groupPeriod: '',
         department: '',
         localthreshold: 0,
-        time_slot: '',
+        timeSlots: '',
       };
     }
   }
@@ -79,5 +84,14 @@ export class CoursesComponent implements OnInit {
 
   goNext() {
     this.next.emit();
+  }
+
+  toggleTimetable() {
+    this.showTable = !this.showTable;
+  }
+
+  updateTimeSlots(timeSlots: string) {
+    this.newCourse.timeSlots = timeSlots;
+    this.toggleTimetable();
   }
 }

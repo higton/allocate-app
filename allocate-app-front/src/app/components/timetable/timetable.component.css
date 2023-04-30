@@ -1,0 +1,44 @@
+table {
+    table-layout: fixed;
+    width: 100%;
+}
+  
+th, td {
+    border: 1px solid black;
+    padding: 5px;
+    width: calc(100% / 7);
+    text-align: center;
+}
+
+th {
+    background-color: gray;
+    color: white;
+}
+
+.selected {
+    background-color: blue;
+    color: white;
+    font-weight: bold;
+}
+
+.time {
+    width: 20%;
+}
+
+.send-button {
+    display: inline-block;
+    padding: 8px 20px;
+    font-size: 16px;
+    font-weight: bold;
+    text-align: center;
+    color: #fff;
+    background-color: #007bff;
+    border: 1px solid #007bff;
+    border-radius: 4px;
+    cursor: pointer;
+  }
+
+.send-button:hover {
+    background-color: #0069d9;
+    border-color: #0062cc;
+}

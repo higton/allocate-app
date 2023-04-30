@@ -37,10 +37,10 @@ export class UserService {
           variables: {
             name: new_course.name,
             professor: new_course.professor,
-            group_period: new_course.group_period,
+            group_period: new_course.groupPeriod,
             department: new_course.department,
             localthreshold: new_course.localthreshold,
-            time_slot: new_course.time_slot,
+            time_slot: new_course.timeSlots,
             account_email,
           },
         })
@@ -137,10 +137,10 @@ export class UserService {
             course_name: oldCourseName,
             new_course_name: newCourse.name,
             new_professor: newCourse.professor,
-            new_group_period: newCourse.group_period,
+            new_group_period: newCourse.groupPeriod,
             new_department: newCourse.department,
             new_localthreshold: newCourse.localthreshold,
-            new_time_slot: newCourse.time_slot,
+            new_time_slot: newCourse.timeSlots,
             account_email,
           },
         })

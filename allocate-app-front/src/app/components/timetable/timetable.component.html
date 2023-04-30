@@ -1,0 +1,25 @@
+<table>
+  <tr>
+    <th>Time</th>
+    <th>Monday</th>
+    <th>Tuesday</th>
+    <th>Wednesday</th>
+    <th>Thursday</th>
+    <th>Friday</th>
+    <th>Saturday</th>
+  </tr>
+  <tr *ngFor="let row of tableData">
+    <td class="time">{{ row.time }}</td>
+    <td *ngFor="let cell of row.cells"
+      (click)="toggleCell(cell)"
+      [ngClass]="{'selected': cell.selected}"
+      [id]=cell.id>
+    </td>
+  </tr>    
+  <tr>
+    <td colspan="7">
+      <button class="send-button" (click)="sendSelection()">Confirmar</button>
+    </td>
+  </tr>
+</table>
+  

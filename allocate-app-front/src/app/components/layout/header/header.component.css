@@ -81,21 +81,15 @@ img:hover{
 }
 
 #profile{
-    width: 56px;
-    height: 56px;
+    width: 48px;
+    height: 48px;
     border-radius: 50%;
     border: solid 2px #212529;
 
+    opacity: 0.8;
     background-color: transparent;
     background-position: center center;
     background-size: cover;
-}
-
-.no-profile#profile{
-    width: 48px;
-    height: 48px;
-
-    opacity: 0.8;
     border: transparent;
     background-image: url("../../../../assets/profile/profile-icon.png");
 }
