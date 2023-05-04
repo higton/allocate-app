@@ -31,7 +31,8 @@ async function init(){
 			group_period VARCHAR(50) NOT NULL,
 			department VARCHAR(50) NOT NULL,
 			localthreshold INT NOT NULL,
-			time_slot VARCHAR(500) NOT NULL
+			time_slot VARCHAR(600) NOT NULL,
+			classrooms VARCHAR(600) NOT NULL
 		)
 		`, (res, err) => {
 		console.log(res, err);
@@ -52,7 +53,8 @@ async function init(){
 		CREATE TABLE IF NOT EXISTS CLASSROOM (
 			id SERIAL PRIMARY KEY,
 			name VARCHAR(30) NOT NULL,
-			number_of_seats INT NOT NULL
+			number_of_seats INT NOT NULL,
+			time_slot VARCHAR(500) NOT NULL
 		)
 	`, (res, err) => {
 		console.log(res, err);
@@ -111,7 +113,7 @@ async function getUser(email){
 
 async function getCoursesFromAccount(email){
 	return pool.query(`
-		SELECT name, professor, group_period, department, localthreshold, time_slot
+		SELECT name, professor, group_period, department, localthreshold, time_slot, classrooms
 		FROM COURSES_ACCOUNT
 		JOIN ACCOUNT ON ACCOUNT.id = fk_account_id
 		JOIN COURSE ON COURSE.id = fk_course_id
@@ -182,11 +184,11 @@ async function changePassword(email, newPassword){
 	});
 };
 
-async function addCourse(name, professor, group_period, department, localthreshold, time_slot){
+async function addCourse(name, professor, group_period, department, localthreshold, time_slot, classrooms){
 	return pool.query(`
-		INSERT INTO COURSE (name, professor, group_period, department, localthreshold, time_slot)
-		VALUES ($1, $2, $3, $4, $5, $6)`,
-		 [name, professor, group_period, department, localthreshold, time_slot]
+		INSERT INTO COURSE (name, professor, group_period, department, localthreshold, time_slot, classrooms)
+		VALUES ($1, $2, $3, $4, $5, $6, $7)`,
+		 [name, professor, group_period, department, localthreshold, time_slot, classrooms]
 	).then((response) => {
 		return "Course added!"
 	}).catch((error) => {
@@ -235,11 +237,10 @@ async function editCourseFromAccount(account_email, course_id, new_name, new_pro
 	})
 };
 
-
-async function addClassroom(name, number_of_seats){
+async function addClassroom(name, number_of_seats, time_slot){
 	return pool.query(
-		'INSERT INTO CLASSROOM (name, number_of_seats) VALUES ($1, $2)',
-		 [name, number_of_seats]
+		'INSERT INTO CLASSROOM (name, number_of_seats, time_slot) VALUES ($1, $2, $3)',
+		 [name, number_of_seats, time_slot]
 	)
 	.then((response) => {
 		return "Classroom added!"
@@ -299,14 +300,15 @@ async function removeClassroom(classroom_id){
 	})
 }
 
-async function editClassroomFromAccount(account_email, new_classroom_name, new_number_of_seats){
+async function editClassroomFromAccount(account_email, classroom_name, new_number_of_seats, new_time_slot){
 	return pool.query(`
 		UPDATE CLASSROOM
-			SET name = $1, number_of_seats = $2
+			SET number_of_seats = $2, time_slot = $4
 		FROM CLASSROOMS_ACCOUNT
 		WHERE CLASSROOMS_ACCOUNT.fk_account_id = (SELECT id FROM ACCOUNT WHERE email = $3)
-		AND CLASSROOMS_ACCOUNT.fk_classroom_id = CLASSROOM.id`,
-		 [new_classroom_name, new_number_of_seats, account_email]
+		AND CLASSROOMS_ACCOUNT.fk_classroom_id = CLASSROOM.id
+		AND CLASSROOM.name = $1`,
+		 [classroom_name, new_number_of_seats, account_email, new_time_slot]
 	).then((response) => {
 		return "Classroom edited from user!"
 	}).catch((error) => {
@@ -317,7 +319,7 @@ async function editClassroomFromAccount(account_email, new_classroom_name, new_n
 
 async function getClassroomsFromAccount(account_email){
 	return pool.query(`
-		SELECT CLASSROOM.name, CLASSROOM.number_of_seats
+		SELECT CLASSROOM.name, CLASSROOM.number_of_seats, CLASSROOM.time_slot
 		FROM CLASSROOM, CLASSROOMS_ACCOUNT
 		WHERE CLASSROOMS_ACCOUNT.fk_account_id = (SELECT id FROM ACCOUNT WHERE email = ($1))
 		AND CLASSROOMS_ACCOUNT.fk_classroom_id = CLASSROOM.id`,

@@ -1,5 +1,5 @@
 class SigaaHelper {
-    static calculateFromhorario(horario) {
+    static parseGroupPeriod(horario) {
         let inputs = horario.split(" ");
         let agrupamento = "";
         let total_aulas = 0

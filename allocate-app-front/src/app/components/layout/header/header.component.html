@@ -5,13 +5,15 @@
       </button>
       
       <div class="dropdown-menu dropdown-menu-right">
-        <a class="nav-item nav-link" (click)="goToCoursesPage()">Turmas</a>
+        <a class="nav-item nav-link" (click)="goToClassroomsPage()">Salas</a>
+        <a class="nav-item nav-link" (click)="goToCoursesPage()">Disciplinas</a>
       </div>
     </div>
     
     <div class="collapse navbar-collapse" id="navbarNavAltMarkup">
       <div class="navbar-nav">
-        <a class="nav-item nav-link" (click)="goToCoursesPage()">Turmas</a>
+        <a class="nav-item nav-link" (click)="goToClassroomsPage()">Salas</a>
+        <a class="nav-item nav-link" (click)="goToCoursesPage()">Disciplinas</a>
       </div>
       <div id="button-row">
         <button *ngIf="!server.isLoggedIn" type="button" class="navbar-button btn" id="button-login" (click)="goToSignUpPage()">sign up</button>
@@ -26,7 +28,7 @@
       <div class="dropdown-menu dropdown-menu-right">
         <a *ngIf="!server.isLoggedIn" class="nav-item nav-link" (click)="goToLoginPage()">Log in</a>
         <a *ngIf="!server.isLoggedIn" class="nav-item nav-link" (click)="goToSignUpPage()">Sign up</a>    
-        <a *ngIf="server.isLoggedIn" class="nav-item nav-link" (click)="goToProfilePage()">Profile</a>
+        <a *ngIf="server.isLoggedIn" class="nav-item nav-link" (click)="goToProfilePage()">Perfil</a>
         <a *ngIf="server.isLoggedIn" class="nav-item nav-link" (click)="logout()">Logout</a> 
       </div>
     </div>

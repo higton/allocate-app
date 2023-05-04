@@ -1,0 +1,23 @@
+<div class="course-section modern">
+    <div class="form-row">
+      <label>Salas disponíveis para adicionar:</label>
+      <select class="classroom-select" name="selectedClassroom" [(ngModel)]="selectedClassroom">
+        <option *ngFor="let classroom of classroomsAvailable" [ngValue]="classroom">{{classroom.name}}</option>
+      </select>
+      <button class="timetable-button" (click)="addClassroom()">Adicionar</button>
+    </div>
+  
+    <div class="classrom-edit-section">
+      <h2>Sala adicionadas:</h2>
+      <form class="course-form">
+        <div class="form-row" *ngFor="let classroom of classroomsAdded">
+          <label>Sala: {{ classroom.name }}</label>
+          <button class="course-button remove-button" (click)="removeClassroom(classroom)">Remover</button>
+        </div>
+        <div class="button-row">
+          <button class="course-button edit-button" (click)="goBack()">Voltar</button>
+          <button class="course-button edit-button" (click)="sendSelection()">Confirmar</button>
+        </div>
+      </form>
+    </div>
+</div>

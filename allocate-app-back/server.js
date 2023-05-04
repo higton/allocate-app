@@ -25,10 +25,12 @@ let UserSchema = buildSchema(`
     department: String,
     localthreshold: Int,
     time_slot: String,
+    classrooms: String,
   }
   type Classroom {
     name: String,
     number_of_seats: Int,
+    time_slot: String,
   }
   type Query {
     getUser(email: String!): User,
@@ -43,12 +45,12 @@ let UserSchema = buildSchema(`
   type Mutation {
     addUser( email: String!, password: String!): String,
     changePassword(email: String!, newPassword: String!): String,
-    addCourseToAccount(name: String!, professor: String!, group_period: String!, department: String!, localthreshold: Int!, time_slot: String!, account_email: String!): String,
+    addCourseToAccount(name: String!, professor: String!, group_period: String!, department: String!, localthreshold: Int!, time_slot: String!, classrooms: String!, account_email: String!): String,
     removeCourseFromAccount(course_name: String!, account_email: String!): String,
     editCourseFromAccount(account_email: String!, course_name: String!, new_course_name: String!, new_professor: String!, new_group_period: String!, new_department: String!, new_localthreshold: Int!, new_time_slot: String!): String,
-    addClassroomToAccount(classroom_name: String!, classroom_number_of_seats: Int!, account_email: String!): String,
+    addClassroomToAccount(classroom_name: String!, classroom_number_of_seats: Int!, time_slot: String!, account_email: String!): String,
     removeClassroomFromAccount(classroom_name: String!, account_email: String!): String,
-    editClassroomFromAccount(account_email: String!, classroom_name: String!, classroom_number_of_seats: Int!): String,
+    editClassroomFromAccount(account_email: String!, classroom_name: String!, classroom_number_of_seats: Int!, classroom_time_slot: String!): String,
   }
 `);
 
@@ -168,7 +170,7 @@ const rootResolver = {
     }
   },
 
-  addCourseToAccount: async ({ name, professor, group_period, department, localthreshold, time_slot, account_email }, req) => {
+  addCourseToAccount: async ({ name, professor, group_period, department, localthreshold, time_slot, classrooms, account_email }, req) => {
     await checkToken(req)
       .then((result) => {
         userData = result;
@@ -179,7 +181,7 @@ const rootResolver = {
     
     // print name
     console.log("name: " + name);
-    await db.addCourse(name, professor, group_period, department, localthreshold, time_slot);
+    await db.addCourse(name, professor, group_period, department, localthreshold, time_slot, classrooms);
 
     return await db.addCourseToAccount(account_email, name);
   },
@@ -212,7 +214,7 @@ const rootResolver = {
     return await db.editCourseFromAccount(account_email, course_id, new_course_name, new_professor, new_group_period, new_department, new_localthreshold, new_time_slot);
   },
 
-  addClassroomToAccount: async ({ classroom_name, classroom_number_of_seats, account_email }, req) => {
+  addClassroomToAccount: async ({ classroom_name, classroom_number_of_seats, time_slot, account_email }, req) => {
     await checkToken(req)
       .then((result) => {
         userData = result;
@@ -221,7 +223,7 @@ const rootResolver = {
         return new Error("It is necessary to login")
       });
     
-    await db.addClassroom(classroom_name, classroom_number_of_seats);
+    await db.addClassroom(classroom_name, classroom_number_of_seats, time_slot);
 
     return await db.addClassroomToAccount(account_email, classroom_name, classroom_number_of_seats);
   },
@@ -240,7 +242,7 @@ const rootResolver = {
     return await db.removeClassroom(classroom_id);
   },
 
-  editClassroomFromAccount: async ({ account_email, classroom_name, classroom_number_of_seats }, req) => {
+  editClassroomFromAccount: async ({ account_email, classroom_name, classroom_number_of_seats, classroom_time_slot }, req) => {
     await checkToken(req)
       .then((result) => {
         userData = result;
@@ -249,7 +251,7 @@ const rootResolver = {
         return new Error("It is necessary to login")
       });
     
-    return await db.editClassroomFromAccount(account_email, classroom_name, classroom_number_of_seats);
+    return await db.editClassroomFromAccount(account_email, classroom_name, classroom_number_of_seats, classroom_time_slot);
   },
 
   getClassroomsFromAccount: async ({email}, req) => {

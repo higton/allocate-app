@@ -1,4 +1,5 @@
-import { Component, EventEmitter, Input, OnInit, Output } from '@angular/core';
+import { Component, Input, OnInit, Output } from '@angular/core';
+import { Router } from '@angular/router';
 
 import { AuthService } from 'src/app/auth/services/auth.service';
 import { UserService } from '../../services/user.service';
@@ -10,34 +11,36 @@ import { Classroom } from 'src/app/models/Classroom';
   styleUrls: ['./classrooms.component.css']
 })
 export class ClassroomsComponent implements OnInit {
-  @Output() next = new EventEmitter();
-  
   newClassroom: Classroom;
-  selectedClassroom: Classroom;
+  selectedClassroom: Classroom = null;
   editedClassroom: Classroom | null = null;
+  showTable: boolean = false;
+  timeTableSlots: String[];
 
   constructor(
     public userService: UserService,
     public authService: AuthService,
+    private router: Router
   ) { }
 
   ngOnInit(): void {
     this.newClassroom = {
       name: '',
-      number_of_seats: 0,
+      numberOfSeats: 0,
+      timeSlots: [],
     };
   }
 
   async addClassroomToAccount() {
     let account_email:String = await this.authService.getEmail();
 
-    if (this.newClassroom.name && this.newClassroom.number_of_seats) {
-      console.log("Adding classroom to account: " + account_email.toString());
+    if (this.newClassroom.name && this.newClassroom.numberOfSeats) {
       await this.userService.addClassroomToAccount(this.newClassroom, account_email.toString());
 
       this.newClassroom = {
         name: '',
-        number_of_seats: 0,
+        numberOfSeats: 0,
+        timeSlots: [],
       };
     }
   }
@@ -70,7 +73,28 @@ export class ClassroomsComponent implements OnInit {
     this.userService.editClassroomFromAccount(classroom, this.editedClassroom, account_email);
   }
 
-  goNext() {
-    this.next.emit();
+  navigateToCourses() {
+    this.router.navigateByUrl('/home/courses');
+  }
+
+  openTimetable(timeSlots: string[]) {
+    this.timeTableSlots = timeSlots;
+
+    this.toggleTimetable();
+  }
+
+
+  toggleTimetable() {
+    this.showTable = !this.showTable;
+  }
+
+  updateTimeSlots(timeSlots: string[]) {
+    if (this.selectedClassroom !== null) {
+      this.editedClassroom.timeSlots = timeSlots;
+    } else {
+      this.newClassroom.timeSlots = timeSlots;
+    }
+    
+    this.toggleTimetable();
   }
 }

@@ -1,9 +1,10 @@
 import { Component, EventEmitter, Input, OnInit, Output } from '@angular/core';
+import { Router } from '@angular/router';
 
 import { AuthService } from '../auth/services/auth.service';
 import { UserService } from '../services/user.service';
 import { Course } from 'src/app/models/Course';
-import SigaaHelper from 'src/util/sigaa';
+import { Classroom } from 'src/app/models/Classroom';
 
 @Component({
   selector: 'app-courses',
@@ -11,16 +12,18 @@ import SigaaHelper from 'src/util/sigaa';
   styleUrls: ['./courses.component.css']
 })
 export class CoursesComponent implements OnInit {
-  @Output() next = new EventEmitter();
-
-  newCourse: Course;
-  selectedCourse: Course;
+  newCourse: Course = null;
+  selectedCourse: Course = null;
   editedCourse: Course | null = null;
   showTable: boolean = false;
+  showClassrooms: boolean = false;
+  timeTableSlots: String[];
+  classrooms: Classroom[];
 
   constructor(
     public userService: UserService,
     public authService: AuthService,
+    private router: Router
   ) { }
 
   ngOnInit(): void {
@@ -30,17 +33,25 @@ export class CoursesComponent implements OnInit {
       groupPeriod: '',
       department: '',
       localthreshold: 0,
-      timeSlots: '',
+      timeSlots: [],
+      classrooms: []
     };
+
+    if (this.userService.coursesList && this.userService.coursesList.length === 0) {
+      this.getCourses();
+    }
+  }
+
+  async getCourses() {
+    let email:String = await this.authService.getEmail();
+
+    await this.userService.getCoursesFromAccount(email);
   }
 
   async addCourseToAccount() {
-    console.log("grupo do horario: ", SigaaHelper.calculateFromhorario(this.newCourse.groupPeriod));
-    console.log("horario: ", this.newCourse.timeSlots.split(","));
-
     let account_email = await this.authService.getEmail();
 
-    if (this.newCourse.name && this.newCourse.professor && this.newCourse.groupPeriod && this.newCourse.department && this.newCourse.localthreshold && this.newCourse.timeSlots) {
+    if (this.newCourse.name && this.newCourse.professor && this.newCourse.groupPeriod && this.newCourse.department) {
       await this.userService.addCourseToAccount(this.newCourse, account_email);
 
       this.newCourse = {
@@ -49,7 +60,8 @@ export class CoursesComponent implements OnInit {
         groupPeriod: '',
         department: '',
         localthreshold: 0,
-        timeSlots: '',
+        timeSlots: [],
+        classrooms: []
       };
     }
   }
@@ -82,16 +94,47 @@ export class CoursesComponent implements OnInit {
     this.userService.editCourseFromAccount(this.editedCourse, account_email, course.name);
   }
 
-  goNext() {
-    this.next.emit();
+  openTimetable(timeSlots: string[]) {
+    this.timeTableSlots = timeSlots;
+
+    this.toggleTimetable();
   }
 
   toggleTimetable() {
     this.showTable = !this.showTable;
   }
 
-  updateTimeSlots(timeSlots: string) {
-    this.newCourse.timeSlots = timeSlots;
+  updateTimeSlots(timeSlots: string[]) {
+    if (this.selectedCourse !== null) {
+      this.editedCourse.timeSlots = timeSlots;
+    } else {
+      this.newCourse.timeSlots = timeSlots;
+    }
+    
     this.toggleTimetable();
+  }
+
+  updateClassrooms(classrooms: Classroom[]) {
+    if (this.selectedCourse !== null) {
+      this.editedCourse.classrooms = classrooms;
+    } else {
+      this.newCourse.classrooms = classrooms;
+    }
+    
+    this.toggleEditClassrooms();
+  }
+
+  navigateToClassrooms() {
+    this.router.navigateByUrl('/home/classrooms');
+  }
+
+  openEditClassrooms(classrooms: Classroom[]) {
+    this.classrooms = classrooms;
+
+    this.toggleEditClassrooms();
+  }
+
+  toggleEditClassrooms() {
+    this.showClassrooms = !this.showClassrooms;
   }
 }

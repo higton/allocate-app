@@ -1,8 +1,11 @@
+import { Classroom } from "./Classroom";
+
 export class Course {
-    name: String;
-    professor: String;
-    groupPeriod: String;
-    department: String;
+    name: string;
+    professor: string;
+    groupPeriod: string;
+    department: string;
     localthreshold: Number;
-    timeSlots: String;
+    timeSlots: string[];
+    classrooms: Classroom[];
 }

@@ -1,11 +1,3 @@
-<div class="container-home">
-    <h2>Courses</h2>
-    <app-courses (next)="handleNextCourse($event)"></app-courses>
-    <h2>Classrooms</h2>
-    <app-classrooms (next)="handleNextClassroom($event)"></app-classrooms>
-    <h2>Result</h2>
-    <!-- iterate over results.courses -->
-    <div *ngFor="let course of results.courses">
-        <h3>{{course.name}} - {{course.professor}} - {{course.group_period}} - {{course.department}} - {{course.localthreshold}} - {{course.time_slot}}</h3>
-    </div>
-</div>
+<div>
+    <router-outlet></router-outlet>
+  </div>

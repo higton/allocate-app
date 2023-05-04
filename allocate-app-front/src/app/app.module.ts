@@ -16,6 +16,8 @@ import { AuthModule } from './auth/auth.module';
 import { CoursesComponent } from './courses/courses.component';
 import { ClassroomsComponent } from './components/classrooms/classrooms.component';
 import { TimetableComponent } from './components/timetable/timetable.component';
+import { CourseClassroomEditComponent } from './components/course-classroom-edit/course-classroom-edit.component';
+import { CourseInputComponent } from './components/course-input/course-input.component';
 
 @NgModule({
   declarations: [
@@ -26,6 +28,8 @@ import { TimetableComponent } from './components/timetable/timetable.component';
     CoursesComponent,
     ClassroomsComponent,
     TimetableComponent,
+    CourseClassroomEditComponent,
+    CourseInputComponent,
   ],
   imports: [
     BrowserAnimationsModule,

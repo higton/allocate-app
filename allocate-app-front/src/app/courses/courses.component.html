@@ -1,38 +1,114 @@
-<div *ngIf="!showTable">
-  <ul>
-    <li *ngFor="let item of userService.coursesList; let i = index">
-      {{ item.name }} - {{ item.professor }} - {{ item.groupPeriod }} - {{ item.department }} - {{ item.localthreshold }} - {{ item.timeSlot }}
-      <button (click)="startEditing(item)">Edit</button>
-      <button (click)="removeItem(item)">Remove</button>
-      <div *ngIf="item === selectedCourse">
-        <form (submit)="editCourse(item)">
-          <input type="text" [(ngModel)]="editedCourse.name" name="name" placeholder="Name">
-          <input type="text" [(ngModel)]="editedCourse.professor" name="professor" placeholder="Professor">
-          <input type="text" [(ngModel)]="editedCourse.groupPeriod" name="groupPeriod" placeholder="Group Period">
-          <input type="text" [(ngModel)]="editedCourse.department" name="department" placeholder="Department">
-          <input type="number" [(ngModel)]="editedCourse.localthreshold" name="localthreshold" placeholder="Local Threshold">
-          <input type="text" [(ngModel)]="editedCourse.timeSlots" name="timeSlots" placeholder="Time Slot">
-          <button type="submit">Save</button>
-          <button type="button" (click)="cancelEditing()">Cancel</button>
-        </form>
+<div *ngIf="!showTable && !showClassrooms">
+  <div class="course-section modern">
+    <h2 *ngIf="userService.coursesList.length && !selectedCourse">Cursos</h2>
+    <h2 *ngIf="selectedCourse">Editar informações do curso</h2>
+    <div *ngFor="let item of userService.coursesList; let i = index">
+      <div class="courses-section modern">
+        <div *ngIf="item === selectedCourse">
+          <form (submit)="editCourse(item)">
+            <div class="form-row">
+              <label for="name">Nome:</label>
+              <input type="text" [(ngModel)]="editedCourse.name" name="name" placeholder="Name">
+            </div>
+            <div class="form-row">
+              <label for="professor">Professor:</label>
+              <input type="text" [(ngModel)]="editedCourse.professor" name="professor" placeholder="Professor">
+            </div>
+            <div class="form-row">
+              <label for="groupPeriod">Período do grupo:</label>
+              <input type="text" [(ngModel)]="editedCourse.groupPeriod" name="groupPeriod" placeholder="Group Period">
+            </div>
+            <div class="form-row">
+              <label for="department">Departamento:</label>
+              <input type="text" [(ngModel)]="editedCourse.department" name="department" placeholder="Department">
+            </div>
+            <div class="form-row">
+              <label for="localthreshold">Limite local:</label>
+              <input type="number" [(ngModel)]="editedCourse.localthreshold" name="localthreshold" placeholder="Local Threshold">
+            </div>
+            <div class="form-row">
+              <label for="timeSlots">Horário:</label>
+              <input type="text" [(ngModel)]="editedCourse.timeSlots" name="timeSlots" placeholder="Time Slot">
+            </div>
+            <div class="button-row">
+              <button type="button" (click)="cancelEditing()" class="course-button">Cancelar</button>
+              <button type="submit" class="course-button">Confirmar</button>
+            </div>
+          </form>
+        </div>
+        <div *ngIf="!selectedCourse" class="form-row">
+          <strong>{{ item.name }}</strong>
+          <div class="button-row">
+            <button (click)="startEditing(item)" class="course-button edit-button">Editar</button>
+            <button (click)="removeItem(item)" class="course-button remove-button">Remover</button>
+          </div>
+        </div>
       </div>
-    </li>
-  </ul>
+    </div>
+  
 
-  <div>
-    <input type="text" [(ngModel)]="newCourse.name" placeholder="Name">
-    <input type="text" [(ngModel)]="newCourse.professor" placeholder="Professor">
-    <input type="text" [(ngModel)]="newCourse.groupPeriod" placeholder="Group Period">
-    <input type="text" [(ngModel)]="newCourse.department" placeholder="Department">
-    <input type="number" [(ngModel)]="newCourse.localthreshold" placeholder="Local Threshold">
-    <input type="text" [(ngModel)]="newCourse.timeSlots" placeholder="Time Slots">
-    <button (click)="addCourseToAccount()">Add Course</button>
-    <button (click)="toggleTimetable()">Show Timetable</button>
+    <h2>Adicionar disciplina</h2>
+    <form class="course-form">
+      <div class="form-row">
+        <label for="course-name">Nome:</label>
+        <input type="text" id="course-name" [(ngModel)]="newCourse.name" placeholder="APC - Turma 1" name="name">
+      </div>
+  
+      <div class="form-row">
+        <label for="course-professor">Professor:</label>
+        <input type="text" id="course-professor" [(ngModel)]="newCourse.professor" placeholder="José" name="professor">
+      </div>
+  
+      <div class="form-row">
+        <label for="course-group-period">Código SIGAA:</label>
+        <input type="text" id="course-group-period" [(ngModel)]="newCourse.groupPeriod" placeholder="246m34 235m12" name="groupPeriod"> 
+      </div>
+  
+      <div class="form-row">
+        <label for="course-department">Departamento:</label>
+        <input type="text" id="course-department" [(ngModel)]="newCourse.department" placeholder="Software" name="Department">
+      </div>
+  
+      <div class="form-row">
+        <label for="course-local-threshold">Intervalo mínimo de dias entre aulas:</label>
+        <input type="number" id="course-local-threshold" [(ngModel)]="newCourse.localthreshold" placeholder="Local threshold" name="localthreshold">
+      </div>
+  
+      <div class="form-row">
+        <label for="course-time-slots">Salas (em que não pode acontecer):</label>
+        <div class="container">
+          <ng-container *ngFor="let classroom of newCourse.classrooms">
+            <strong>{{ classroom.name }} </strong>
+          </ng-container>
+        </div>
+        <button class="timetable-button" type="button" (click)="openEditClassrooms(newCourse.classrooms)">Editar Salas</button>
+      </div>
+  
+      <div class="form-row">
+        <label for="course-time-slots">Turnos (em que não pode acontecer):</label>
+        <div class="container">
+          <strong>{{ this.newCourse.timeSlots }}</strong>
+        </div>
+        <button class="timetable-button" (click)="openTimetable(newCourse.timeSlots)">Editar Turnos</button>
+      </div>
+
+      <div class="button-row">
+        <button class="course-button" (click)="addCourseToAccount()">Add Course</button>
+      </div>
+    </form>
+  
+    <div class="navigation-buttons">
+      <button class="navigation-button" (click)="navigateToClassrooms()">Voltar para a criação de salas</button>
+      <button class="navigation-button">Próximo passo!</button>
+    </div>
   </div>
-
-  <button (click)="goNext()">Next!</button>
+  
 </div>
 
 <div *ngIf="showTable" class="timetable-container">
-  <app-timetable [timeSlots]="newCourse.timeSlots" (changeTimeSlotsEvent)="updateTimeSlots($event)"></app-timetable>
+    <app-timetable [timeSlots]="timeTableSlots" (changeTimeSlotsEvent)="updateTimeSlots($event)"></app-timetable>
+</div>
+  
+<div *ngIf="showClassrooms">
+  <app-course-classroom-edit [classroomsAdded]="classrooms" (changeClassroomsEvent)="updateClassrooms($event)"></app-course-classroom-edit>
 </div>

@@ -21,10 +21,6 @@ export class HeaderComponent implements OnInit {
 
   ngOnInit(): void {
     this.init();
-
-    this.userService.getUpdateProfilePictureEvent().subscribe(() => {
-      this.init();
-    });
   }
 
   async init(){
@@ -35,8 +31,12 @@ export class HeaderComponent implements OnInit {
     this.router.navigate(['/home']);
   }
 
+  goToClassroomsPage(){
+    this.router.navigate(['/home/classrooms']);
+  }
+
   goToCoursesPage(){
-    this.router.navigate(['/home']);
+    this.router.navigate(['/home/courses']);
   }
 
   goToLoginPage(){
@@ -53,6 +53,5 @@ export class HeaderComponent implements OnInit {
 
   async logout(){
     await this.authService.logout();
-    this.userService.sendUpdateProfilePictureEvent();
   }
 }

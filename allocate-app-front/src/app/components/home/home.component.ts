@@ -16,6 +16,7 @@ export class HomeComponent implements OnInit {
   coursesList: Course[] = [];
   classroomsList: Classroom[] = [];
   results: any = { courses: [], classrooms: []};
+  step: number = 0;
 
   constructor(public authService: AuthService, 
               public userService: UserService,
@@ -36,25 +37,20 @@ export class HomeComponent implements OnInit {
   async getClassrooms(){
     let email:String = await this.authService.getEmail();
 
-    this.classroomsList = await this.userService.getClassroomsFromAccount(email);
+    await this.userService.getClassroomsFromAccount(email);
   }
 
   handleNextCourse(event: any) {
-    // print to console to show that the event was emitted
-    console.log('next button clicked');
-  }
 
-  handleNextClassroom(event: any) {
-    // print to console to show that the event was emitted
-    console.log('next button clicked');
-    
-    // push to results the list of courses and classrooms
     this.results = {
       courses: this.coursesList,
       classrooms: this.classroomsList
     }
-
-    // print results beautifully
     console.log(JSON.stringify(this.results, null, 2));
+    this.step = 2;
+  }
+
+  handleNextClassroom(event: any) {
+    this.step = 1;
   }
 }

@@ -1,0 +1,126 @@
+.modern {
+  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+  color: #333;
+}
+
+.modern h2 {
+  font-weight: 600;
+  font-size: 32px;
+  margin-bottom: 20px;
+}
+
+.classrooms-section {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 20px;
+}
+
+label {
+  display: inline-block;
+  margin-right: 10px;
+  margin-bottom: 5px;
+  width: 250px;
+}
+
+input {
+  width: 400px;
+}
+
+.form-row {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  margin-bottom: 10px;
+}
+
+.button-row {
+  display: flex;
+  flex-direction: row;
+  justify-content: center;
+}
+
+.form-row input[type="text"],
+.form-row input[type="number"] {
+  font-size: 16px;
+  padding: 10px;
+  border: none;
+  border-radius: 3  px;
+  border: 1px solid #ddd;
+  border-radius: 3px;
+}
+
+.form-row input[type="text"]::placeholder,
+.form-row input[type="number"]::placeholder {
+  color: #999;
+}
+
+.form-row button.timetable-button {
+  margin-left: 10px;
+  font-size: 14px;
+  color: #007bff;
+  background-color: transparent;
+  border: none;
+  cursor: pointer;
+}
+
+.classroom-button {
+  margin-top: 20px;
+  font-size: 16px;
+  color: #fff;
+  background-color: #007bff;
+  border: none;
+  border-radius: 3px;
+  padding: 10px 20px;
+  cursor: pointer;
+  transition: background-color 0.2s ease;
+  width: 300px;
+  margin: 0 20px;
+}
+
+.classroom-button:hover {
+  background-color: #0069d9;
+}
+
+.classroom-button.remove-button {
+  width: 120px;
+  background-color: #dc3545;
+  margin: 0 0 0 20px;
+}
+
+.classroom-button.remove-button:hover {
+  background-color: #c82333;
+}
+
+.classroom-button.edit-button {
+  width: 100px;
+  margin: 0 0 0 20px;
+}
+
+
+.navigation-buttons {
+  margin-top: 20px;
+  display: flex;
+  flex-direction: row;
+}
+
+.navigation-button {
+  font-size: 14px;
+  color: #007bff;
+  background-color: transparent;
+  border: none;
+  cursor: pointer;
+  margin-right: 10px;
+}
+
+.navigation-button:last-child {
+  margin-right: 0;
+}
+
+.container {
+  height: 50px;
+  width: 200px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}

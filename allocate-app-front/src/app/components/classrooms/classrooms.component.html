@@ -1,23 +1,72 @@
-<ul>
-  <li *ngFor="let item of userService.classroomsList; let i = index">
-    {{ item.name }} - {{ item.number_of_seats }} students
-    <button (click)="startEditing(item)">Edit</button>
-    <button (click)="removeItem(item)">Remove</button>
-    <div *ngIf="item === selectedClassroom">
-      <form (submit)="editClassroom(item)">
-        <input type="text" [(ngModel)]="editedClassroom.name" name="name" placeholder="Name">
-        <input type="number" [(ngModel)]="editedClassroom.number_of_seats" name="number_of_seats" placeholder="Number of Seats">
-        <button type="submit">Save</button>
-        <button type="button" (click)="cancelEditing()">Cancel</button>
+<div *ngIf="!showTable"class="classrooms-section modern">
+  <h2 *ngIf="userService.classroomsList.length && !selectedClassroom">Salas</h2>
+  <h2 *ngIf="selectedClassroom">Editar informações da Sala</h2>
+  <div *ngFor="let item of userService.classroomsList; let i = index">
+    <div class="classrooms-section modern">
+      <div *ngIf="item === selectedClassroom">
+        <form (submit)="editClassroom(item)">
+          <div class="form-row">
+            <label for="name">Nome:</label>
+            <strong>{{ item.name }}</strong>
+          </div>
+          <div class="form-row">
+            <label for="numberOfSeats">Número de assentos:</label>
+            <input type="number" [(ngModel)]="editedClassroom.numberOfSeats" name="numberOfSeats" placeholder="Number of Seats">
+          </div>
+          <div class="form-row">
+            <label for="timeSlots">Turnos (que não pode usar a sala):</label>
+            <div class="container">
+              {{ this.editedClassroom.timeSlots }}
+            </div>
+            <button class="timetable-button" type="button" (click)="openTimetable(editedClassroom.timeSlots)">Editar turnos disponíveis</button>
+          </div>
+          <div class="button-row">
+            <button type="button" (click)="cancelEditing()" class="classroom-button">Cancelar</button>
+            <button type="submit" class="classroom-button">Confirmar</button>
+          </div>
+        </form>
+      </div>
+      <div *ngIf="!selectedClassroom" class="form-row">
+        {{ item.name }} - {{ item.numberOfSeats }} students
+        <div class="button-row">
+          <button (click)="startEditing(item)" class="classroom-button edit-button">Editar</button>
+          <button (click)="removeItem(item)" class="classroom-button remove-button">Remover</button>
+        </div>
+      </div>
+    </div>
+  </div>
+  
+  <div *ngIf="!selectedClassroom" class="classrooms-section modern">
+    <h2>Adicionar nova Sala</h2>
+    <div class="form-container">
+      <form (submit)="addClassroomToAccount()">
+        <div class="form-row">
+          <label for="name">Nome:</label>
+          <input type="text" [(ngModel)]="newClassroom.name" name="name" placeholder="Name">
+        </div>
+        <div class="form-row">
+          <label for="numberOfSeats">Número de assentos:</label>
+          <input type="number" [(ngModel)]="newClassroom.numberOfSeats" name="numberOfSeats" placeholder="Number of Seats">
+        </div>
+        <div class="form-row">
+          <label for="timeSlots">Turnos (que não pode usar a sala):</label>
+          <div class="container">
+            {{ this.newClassroom.timeSlots }}
+          </div>
+          <button class="timetable-button" type="button" (click)="openTimetable(newClassroom.timeSlots)">Editar turnos disponíveis</button>
+        </div>
+        <div class="button-row">
+          <button type="submit" class="classroom-button">Add Classroom</button>
+        </div>
       </form>
     </div>
-  </li>
-</ul>
-  
-<div>
-  <input type="text" [(ngModel)]="newClassroom.name" placeholder="Name">
-  <input type="number" [(ngModel)]="newClassroom.number_of_seats" placeholder="Number of Seats">
-  <button (click)="addClassroomToAccount()">Add Classroom</button>
+
+    <div class="navigation-buttons">
+      <button class="navigation-button" (click)="navigateToCourses()">Próximo passo!</button>
+    </div>
+  </div>
 </div>
 
-<button (click)="goNext()">Next!</button>
+<div *ngIf="showTable" class="timetable-container">
+  <app-timetable [timeSlots]="timeTableSlots" (changeTimeSlotsEvent)="updateTimeSlots($event)"></app-timetable>
+</div>

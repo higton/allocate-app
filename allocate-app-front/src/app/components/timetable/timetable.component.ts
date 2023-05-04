@@ -7,15 +7,17 @@ import { tableData } from './data';
   styleUrls: ['./timetable.component.css']
 })
 export class TimetableComponent implements OnInit {
-  @Input() timeSlots = '';
+  @Input() timeSlots = [];
   @Output() changeTimeSlotsEvent = new EventEmitter();
 
   selectedCells: string[] = [];
-  tableData = tableData;
+  tableData = [];
 
   constructor() { }
 
   ngOnInit(): void {
+    this.tableData = JSON.parse(JSON.stringify(tableData)); // deep copy
+
     this.selectCells(this.timeSlots);
   }
 
@@ -32,16 +34,19 @@ export class TimetableComponent implements OnInit {
   }
 
   sendSelection() {
-    const selectedIds = this.selectedCells.join(',');
+    const selectedIds = this.selectedCells;
     this.changeTimeSlotsEvent.emit(selectedIds);
   }
 
-  selectCells(message: string) {
-    if (message === "") {
+  selectCells(timeSlots: string[]) {
+    if (!timeSlots.length) {
       return;
     }
 
-    let cells_id = message.split(" ");
+    let cells_id = [];
+    for (let timeSlot of timeSlots) {
+      cells_id.push(timeSlot);
+    }
 
     // iterate over the rows
     for (let row of this.tableData) {
