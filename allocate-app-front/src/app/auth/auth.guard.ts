@@ -38,7 +38,6 @@ export class authDeactivate implements CanActivate {
     let url: string = state.url;
     let isLogged = await this.authService.isLogged(url);
     if(isLogged){
-      console.log('isLogged', isLogged);
       this.router.navigate(['/home/classrooms']);
     }
     return !isLogged;

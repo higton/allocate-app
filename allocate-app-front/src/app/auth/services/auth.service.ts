@@ -83,7 +83,6 @@ export class AuthService {
           query,
         })
       ).subscribe((response: any) => { 
-        console.log('response', response);
         resolve(response.data.getUserFromToken);
       })
     });
@@ -105,11 +104,9 @@ export class AuthService {
           if(!response.errors){
             await this.login(email, password);
           }
-          console.log('response', response);
           resolve(response);
         },
         async (error: any) => {
-          console.log('error', error);
           reject(error);
         }
       );
@@ -125,7 +122,6 @@ export class AuthService {
         password: password
       }).subscribe(
         async (response: any) => {
-          console.log('response', response);
           if(response.auth === true && response.token !== undefined) {
             token = response.token;
             this.server.setLoggedIn(true, token);
@@ -143,7 +139,6 @@ export class AuthService {
           resolve(response);
          },
         (err:any) => {
-          console.log('error', err);
           reject(err);
         }
       )
@@ -164,9 +159,7 @@ export class AuthService {
   }
 
   checkToken(){
-    return this.server.request('GET', '/checkToken').subscribe((response) => {
-      console.log('response', response);
-    })
+    return this.server.request('GET', '/checkToken')
   }
 
   isLogged(url): any {
@@ -174,14 +167,12 @@ export class AuthService {
       this.server.request('GET', '/checkToken')
         .subscribe(
           (response) => {
-            console.log('response', response);
             resolve(true);
           },
           (err) => {
             // Store the attempted URL for redirecting
             this.redirectUrl = url;
 
-            console.log('error', err);
             resolve(false);
           }
         );
@@ -203,16 +194,13 @@ export class AuthService {
         })
       ).subscribe(
         (response: any) => { 
-          console.log('response', response);
           if(response.data.isCorrectPassword){
             resolve(true);
           } else {
-            console.log('erros: ', response.errors[0].message);
             resolve(false);
           }
         },
-        (err) => { 
-          console.log('error', err);
+        (err) => {
           reject(err);
         }
        )
@@ -231,7 +219,6 @@ export class AuthService {
           variables: { email, newPassword },
         })
       ).subscribe((response: any) => {
-        console.log('response', response);
         resolve()
       })
     });
@@ -251,17 +238,14 @@ export class AuthService {
           variables: { email },
         })
       ).subscribe(
-        (response: any) => { 
-          console.log('response', response);
+        (response: any) => {
           if(response.data.checkEmail){
             resolve(true);
           } else {
-            console.log('erros: ', response);
             resolve(false);
           }
         },
-        (err) => { 
-          console.log('error', err);
+        (err) => {
           reject(err);
         })
     });

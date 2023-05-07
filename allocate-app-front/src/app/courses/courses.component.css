@@ -40,30 +40,6 @@ input {
   justify-content: center;
 }
 
-.form-row input[type="text"],
-.form-row input[type="number"] {
-  font-size: 16px;
-  padding: 10px;
-  border: none;
-  border-radius: 3  px;
-  border: 1px solid #ddd;
-  border-radius: 3px;
-}
-
-.form-row input[type="text"]::placeholder,
-.form-row input[type="number"]::placeholder {
-  color: #999;
-}
-
-.form-row button.timetable-button {
-  margin-left: 10px;
-  font-size: 14px;
-  color: #007bff;
-  background-color: transparent;
-  border: none;
-  cursor: pointer;
-}
-
 .course-button {
   margin-top: 20px;
   font-size: 16px;
@@ -74,7 +50,7 @@ input {
   padding: 10px 20px;
   cursor: pointer;
   transition: background-color 0.2s ease;
-  width: 300px;
+  width: 350px;
 }
 
 .course-button:hover {
@@ -113,12 +89,4 @@ input {
 
 .navigation-button:last-child {
   margin-right: 0;
-}
-
-.container {
-  height: 50px;
-  width: 200px;
-  white-space: nowrap;
-  overflow: hidden;
-  text-overflow: ellipsis;
 }

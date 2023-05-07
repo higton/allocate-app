@@ -12,13 +12,14 @@ import { Classroom } from 'src/app/models/Classroom';
   styleUrls: ['./courses.component.css']
 })
 export class CoursesComponent implements OnInit {
-  newCourse: Course = null;
   selectedCourse: Course = null;
-  editedCourse: Course | null = null;
+  newCourse: Course = null;
   showTable: boolean = false;
   showClassrooms: boolean = false;
   timeTableSlots: String[];
   classrooms: Classroom[];
+  editedCourse: Course = null;
+  showList: boolean = true;
 
   constructor(
     public userService: UserService,
@@ -27,6 +28,10 @@ export class CoursesComponent implements OnInit {
   ) { }
 
   ngOnInit(): void {
+    if (this.userService.coursesList && this.userService.coursesList.length === 0) {
+      this.getCourses();
+    }
+
     this.newCourse = {
       name: '',
       professor: '',
@@ -36,10 +41,7 @@ export class CoursesComponent implements OnInit {
       timeSlots: [],
       classrooms: []
     };
-
-    if (this.userService.coursesList && this.userService.coursesList.length === 0) {
-      this.getCourses();
-    }
+    
   }
 
   async getCourses() {
@@ -48,25 +50,15 @@ export class CoursesComponent implements OnInit {
     await this.userService.getCoursesFromAccount(email);
   }
 
-  async addCourseToAccount() {
+  async addCourseToAccount(newCourse: Course) {
     let account_email = await this.authService.getEmail();
 
-    if (this.newCourse.name && this.newCourse.professor && this.newCourse.groupPeriod && this.newCourse.department) {
-      await this.userService.addCourseToAccount(this.newCourse, account_email);
-
-      this.newCourse = {
-        name: '',
-        professor: '',
-        groupPeriod: '',
-        department: '',
-        localthreshold: 0,
-        timeSlots: [],
-        classrooms: []
-      };
+    if (newCourse.name && newCourse.professor && newCourse.groupPeriod && newCourse.department) {
+      await this.userService.addCourseToAccount(newCourse, account_email);
     }
   }
 
-  async removeItem(course: Course) {
+  async removeCourse(course: Course) {
     let account_email:String = await this.authService.getEmail();
 
     await this.userService.removeCourseFromAccount(course.name, account_email);
@@ -91,50 +83,24 @@ export class CoursesComponent implements OnInit {
 
     let account_email:String = await this.authService.getEmail();
 
-    this.userService.editCourseFromAccount(this.editedCourse, account_email, course.name);
-  }
-
-  openTimetable(timeSlots: string[]) {
-    this.timeTableSlots = timeSlots;
-
-    this.toggleTimetable();
-  }
-
-  toggleTimetable() {
-    this.showTable = !this.showTable;
-  }
-
-  updateTimeSlots(timeSlots: string[]) {
-    if (this.selectedCourse !== null) {
-      this.editedCourse.timeSlots = timeSlots;
-    } else {
-      this.newCourse.timeSlots = timeSlots;
-    }
-    
-    this.toggleTimetable();
-  }
-
-  updateClassrooms(classrooms: Classroom[]) {
-    if (this.selectedCourse !== null) {
-      this.editedCourse.classrooms = classrooms;
-    } else {
-      this.newCourse.classrooms = classrooms;
-    }
-    
-    this.toggleEditClassrooms();
+    this.userService.editCourseFromAccount(course, account_email, this.editedCourse.name);
   }
 
   navigateToClassrooms() {
     this.router.navigateByUrl('/home/classrooms');
   }
 
-  openEditClassrooms(classrooms: Classroom[]) {
-    this.classrooms = classrooms;
-
-    this.toggleEditClassrooms();
+  updateSelectedCourse(course: Course) {
+    this.editCourse(course);
   }
 
-  toggleEditClassrooms() {
-    this.showClassrooms = !this.showClassrooms;
+  updateNewCourse(course: Course) {
+    this.addCourseToAccount(course);
+
+    this.toggleShowList();
+  }
+
+  toggleShowList() {
+    this.showList = !this.showList;
   }
 }

@@ -43,14 +43,55 @@ let UserSchema = buildSchema(`
     getClassroomsFromAccount(email: String!): [Classroom],
   }
   type Mutation {
-    addUser( email: String!, password: String!): String,
-    changePassword(email: String!, newPassword: String!): String,
-    addCourseToAccount(name: String!, professor: String!, group_period: String!, department: String!, localthreshold: Int!, time_slot: String!, classrooms: String!, account_email: String!): String,
-    removeCourseFromAccount(course_name: String!, account_email: String!): String,
-    editCourseFromAccount(account_email: String!, course_name: String!, new_course_name: String!, new_professor: String!, new_group_period: String!, new_department: String!, new_localthreshold: Int!, new_time_slot: String!): String,
-    addClassroomToAccount(classroom_name: String!, classroom_number_of_seats: Int!, time_slot: String!, account_email: String!): String,
-    removeClassroomFromAccount(classroom_name: String!, account_email: String!): String,
-    editClassroomFromAccount(account_email: String!, classroom_name: String!, classroom_number_of_seats: Int!, classroom_time_slot: String!): String,
+    addUser( 
+      email: String!, 
+      password: String!
+    ): String,
+    changePassword(
+      email: String!, 
+      newPassword: String!
+    ): String,
+    addCourseToAccount(
+      name: String!, 
+      professor: String!, 
+      group_period: String!, 
+      department: String!, 
+      localthreshold: Int!, 
+      time_slot: String!, 
+      classrooms: String!, 
+      account_email: String!
+    ): String,
+    removeCourseFromAccount(
+      course_name: String!, 
+      account_email: String!
+    ): String,
+    editCourseFromAccount(
+      account_email: String!, 
+      course_name: String!, 
+      new_course_name: String!, 
+      new_professor: String!, 
+      new_group_period: String!, 
+      new_department: String!, 
+      new_localthreshold: Int!, 
+      new_time_slot: String!, 
+      new_classrooms: String!
+    ): String,
+    addClassroomToAccount(
+      classroom_name: String!, 
+      classroom_number_of_seats: Int!, 
+      time_slot: String!, 
+      account_email: String!
+    ): String,
+    removeClassroomFromAccount(
+      classroom_name: String!, 
+      account_email: String!
+    ): String,
+    editClassroomFromAccount(
+      account_email: String!, 
+      classroom_name: String!, 
+      classroom_number_of_seats: Int!, 
+      classroom_time_slot: String!
+    ): String,
   }
 `);
 
@@ -179,8 +220,6 @@ const rootResolver = {
         return new Error("It is necessary to login")
       });
     
-    // print name
-    console.log("name: " + name);
     await db.addCourse(name, professor, group_period, department, localthreshold, time_slot, classrooms);
 
     return await db.addCourseToAccount(account_email, name);
@@ -200,7 +239,18 @@ const rootResolver = {
     return await db.removeCourse(course_id);
   },
 
-  editCourseFromAccount: async ({ account_email, course_name, new_course_name, new_professor, new_group_period, new_department, new_localthreshold, new_time_slot }, req) => {
+  editCourseFromAccount: async (
+    { 
+      account_email, 
+      course_name, 
+      new_course_name, 
+      new_professor, 
+      new_group_period, 
+      new_department, 
+      new_localthreshold, 
+      new_time_slot,
+      new_classrooms
+    }, req) => {
     await checkToken(req)
       .then((result) => {
         userData = result;
@@ -211,7 +261,7 @@ const rootResolver = {
     
     let course_id = await db.getCourseIdFromAccount(account_email, course_name);
 
-    return await db.editCourseFromAccount(account_email, course_id, new_course_name, new_professor, new_group_period, new_department, new_localthreshold, new_time_slot);
+    return await db.editCourseFromAccount(account_email, course_id, new_course_name, new_professor, new_group_period, new_department, new_localthreshold, new_time_slot, new_classrooms);
   },
 
   addClassroomToAccount: async ({ classroom_name, classroom_number_of_seats, time_slot, account_email }, req) => {

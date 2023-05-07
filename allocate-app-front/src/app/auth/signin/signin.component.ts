@@ -27,8 +27,6 @@ export class SigninComponent implements OnInit {
       if (result.errors && result.errors.length > 0) {
         this.showErrorMessage = result.errors[0].message;
       }
-
-      console.log('this.showErrorMessage', this.showErrorMessage);
     })
     .catch(error =>{
       this.showErrorMessage = this.authService.translateErrorMessage(error);

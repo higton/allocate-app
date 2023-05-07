@@ -17,41 +17,56 @@ export class UserService {
 
   constructor(private server: ServerService) { }
 
-  addCourseToAccount(new_course: Course, account_email: String){
+  addCourseToAccount(newCourse: Course, account_email: String){
+    // if a course with the same name already exists, do nothing
+    if (this.coursesList.find((course) => course.name === newCourse.name)) {
+      return;
+    }
+
+    let classrooms = newCourse.classrooms.map((classroom) => classroom.name).join(',');
+
     const query = `
-      mutation addCourseToAccount($name: String!, $professor: String!, $group_period: String!, $department: String!, $localthreshold: Int!, $time_slot: String!, $classrooms: String!, $account_email: String!) {
-        addCourseToAccount(
-          name: $name, 
-          professor: $professor, 
-          group_period: $group_period, 
-          department: $department, 
-          localthreshold: $localthreshold, 
-          time_slot: $time_slot, 
-          classrooms: $classrooms, 
-          account_email: $account_email
-        )}`;
+      mutation addCourseToAccount(
+        $name: String!, 
+        $professor: String!, 
+        $group_period: String!, 
+        $department: String!, 
+        $localthreshold: Int!, 
+        $time_slot: String!, 
+        $classrooms: String!, 
+        $account_email: String!) {
+          addCourseToAccount(
+            name: $name, 
+            professor: $professor, 
+            group_period: $group_period, 
+            department: $department, 
+            localthreshold: $localthreshold, 
+            time_slot: $time_slot, 
+            classrooms: $classrooms, 
+            account_email: $account_email
+          )
+        }`;
     
     return new Promise<void>((resolve, reject) => {
       this.server.request('POST', '/graphql',
         JSON.stringify({
           query,
           variables: {
-            name: new_course.name,
-            professor: new_course.professor,
-            group_period: new_course.groupPeriod,
-            department: new_course.department,
-            localthreshold: new_course.localthreshold,
-            time_slot: new_course.timeSlots.join(','),
-            classrooms: new_course.classrooms.join(','),
+            name: newCourse.name,
+            professor: newCourse.professor,
+            group_period: newCourse.groupPeriod,
+            department: newCourse.department,
+            localthreshold: newCourse.localthreshold,
+            time_slot: newCourse.timeSlots.join(','),
+            classrooms: classrooms,
             account_email,
           },
         })
       ).subscribe((response: any) => {
-        this.coursesList.push(new_course);
+        this.coursesList.push(newCourse);
 
         resolve();
       }, (err) => {
-        console.log('error', err);
         reject(err);
       });
     });
@@ -84,15 +99,30 @@ export class UserService {
           
           response.data.getCoursesFromAccount.forEach((course) => {
             const timeSlots = course.time_slot.split(',');
-            const classrooms = course.classrooms.split(',');
-            const newCourse = {
+            let classrooms = [];
+
+            if (course.classrooms !== '') {
+              classrooms = course.classrooms.split(',');
+            }
+
+            const newClassrooms:Classroom[] = classrooms.map((classroomName) => { 
+              const classroomObj = this.classroomsList.find((classroomObj) => classroomObj.name === classroomName);
+
+              return {
+                name: classroomName,
+                numberOfSeats: classroomObj ? classroomObj.numberOfSeats : 0,
+                timeSlots: classroomObj ? classroomObj.timeSlots : [],
+              };
+            });
+
+            const newCourse:Course = {
               name: course.name,
               professor: course.professor,
               groupPeriod: course.group_period,
               department: course.department,
               localthreshold: course.localthreshold,
               timeSlots,
-              classrooms,
+              classrooms: newClassrooms,
             };
             this.coursesList.push(newCourse);
           });
@@ -100,7 +130,6 @@ export class UserService {
           resolve(this.coursesList);
         },
         (err) => {
-          console.log('error', err);
           reject(err);
         })
     });
@@ -120,24 +149,41 @@ export class UserService {
           variables: { course_name, account_email },
         })
       ).subscribe((response: any) => {
-        console.log('response', response);
-
-        // remove course from coursesList
         this.coursesList = this.coursesList.filter((course) => course.name !== course_name);
         resolve();
       },
       (err) => {
-        console.log('error', err);
         reject(err);
       })
     });
   }
 
   editCourseFromAccount(newCourse: Course, account_email: String, oldCourseName: String) {
+    let classrooms = newCourse.classrooms.map((classroom) => classroom.name).join(',');
+
     const query = `
-      mutation editCourseFromAccount($course_name: String!, $new_course_name: String!, $new_professor: String!, $new_group_period: String!, $new_department: String!, $new_localthreshold: Int!, $new_time_slot: String!, $account_email: String!) {
-        editCourseFromAccount(course_name: $course_name, new_course_name: $new_course_name, new_professor: $new_professor, new_group_period: $new_group_period, new_department: $new_department, new_localthreshold: $new_localthreshold, new_time_slot: $new_time_slot, account_email: $account_email)
-      }
+      mutation editCourseFromAccount(
+        $course_name: String!, 
+        $new_course_name: String!, 
+        $new_professor: String!, 
+        $new_group_period: String!, 
+        $new_department: String!, 
+        $new_localthreshold: Int!, 
+        $new_time_slot: String!, 
+        $account_email: String!,
+        $new_classrooms: String!) {
+          editCourseFromAccount(
+            course_name: $course_name, 
+            new_course_name: $new_course_name, 
+            new_professor: $new_professor, 
+            new_group_period: $new_group_period, 
+            new_department: $new_department, 
+            new_localthreshold: $new_localthreshold, 
+            new_time_slot: $new_time_slot, 
+            account_email: $account_email,
+            new_classrooms: $new_classrooms
+          )
+        }
     `;
 
     return new Promise<void>((resolve, reject) => {
@@ -151,13 +197,12 @@ export class UserService {
             new_group_period: newCourse.groupPeriod,
             new_department: newCourse.department,
             new_localthreshold: newCourse.localthreshold,
-            new_time_slot: newCourse.timeSlots,
+            new_time_slot: newCourse.timeSlots.join(','),
+            new_classrooms: classrooms,
             account_email,
           },
         })
       ).subscribe((response: any) => {
-        console.log('response', response);
-
         // update course in coursesList
         this.coursesList = this.coursesList.map((course) => {
           if (course.name === oldCourseName) {
@@ -169,7 +214,6 @@ export class UserService {
         resolve();
       },
       (err) => {
-        console.log('error', err);
         reject(err);
       })
     });
@@ -208,7 +252,6 @@ export class UserService {
         resolve();
       },
       (err) => {
-        console.log('error', err);
         reject(err);
       })
     });
@@ -233,7 +276,6 @@ export class UserService {
         resolve();
       },
       (err) => {
-        console.log('error', err);
         reject(err);
       })
     });
@@ -241,8 +283,17 @@ export class UserService {
 
   editClassroomFromAccount(classroom: Classroom, editedClassroom: Classroom, account_email: String){
     const query = `
-      mutation editClassroomFromAccount($classroom_name: String!, $classroom_number_of_seats: Int!, $classroom_time_slot: String!, $account_email: String!) {
-        editClassroomFromAccount(classroom_name: $classroom_name, classroom_number_of_seats: $classroom_number_of_seats, classroom_time_slot: $classroom_time_slot, account_email: $account_email)
+      mutation editClassroomFromAccount(
+        $classroom_name: String!, 
+        $classroom_number_of_seats: Int!, 
+        $classroom_time_slot: String!, 
+        $account_email: String!
+      ) {
+        editClassroomFromAccount(
+          classroom_name: $classroom_name, 
+          classroom_number_of_seats: $classroom_number_of_seats, 
+          classroom_time_slot: $classroom_time_slot, 
+          account_email: $account_email)
       }
     `;
 
@@ -270,7 +321,6 @@ export class UserService {
         resolve();
       },
       (err) => {
-        console.log('error', err);
         reject(err);
       })
     });
@@ -307,7 +357,6 @@ export class UserService {
         resolve(response.data.getClassroomsFromAccount);
       },
       (err) => {
-        console.log('error', err);
         reject(err);
       })
     });

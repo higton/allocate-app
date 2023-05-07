@@ -223,13 +223,13 @@ async function removeCourseFromAccount(account_email, course_name){
 	})
 };
 
-async function editCourseFromAccount(account_email, course_id, new_name, new_professor, new_group_period, new_department, new_localthreshold, new_time_slot){
+async function editCourseFromAccount(account_email, course_id, new_name, new_professor, new_group_period, new_department, new_localthreshold, new_time_slot, new_classrooms){
 	return pool.query(`
 		UPDATE COURSE
-		SET name = ($3), professor = ($4), group_period = ($5), department = ($6), localthreshold = ($7), time_slot = ($8)
+		SET name = ($3), professor = ($4), group_period = ($5), department = ($6), localthreshold = ($7), time_slot = ($8), classrooms = ($9)
 		WHERE id = ($2)
 		AND id IN (SELECT fk_course_id FROM COURSES_ACCOUNT WHERE fk_account_id IN (SELECT id FROM ACCOUNT WHERE email = ($1)))`,
-		 [account_email, course_id, new_name, new_professor, new_group_period, new_department, new_localthreshold, new_time_slot]
+		 [account_email, course_id, new_name, new_professor, new_group_period, new_department, new_localthreshold, new_time_slot, new_classrooms]
 	).then((response) => {
 		return "Course edited!"
 	}).catch((error) => {

@@ -46,7 +46,7 @@ export class HomeComponent implements OnInit {
       courses: this.coursesList,
       classrooms: this.classroomsList
     }
-    console.log(JSON.stringify(this.results, null, 2));
+
     this.step = 2;
   }
 

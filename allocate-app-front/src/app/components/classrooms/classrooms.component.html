@@ -27,7 +27,7 @@
         </form>
       </div>
       <div *ngIf="!selectedClassroom" class="form-row">
-        {{ item.name }} - {{ item.numberOfSeats }} students
+        <strong>{{ item.name }} - {{ item.numberOfSeats }} assentos </strong>
         <div class="button-row">
           <button (click)="startEditing(item)" class="classroom-button edit-button">Editar</button>
           <button (click)="removeItem(item)" class="classroom-button remove-button">Remover</button>
@@ -56,7 +56,7 @@
           <button class="timetable-button" type="button" (click)="openTimetable(newClassroom.timeSlots)">Editar turnos disponíveis</button>
         </div>
         <div class="button-row">
-          <button type="submit" class="classroom-button">Add Classroom</button>
+          <button type="submit" class="classroom-button">Adicionar Sala</button>
         </div>
       </form>
     </div>

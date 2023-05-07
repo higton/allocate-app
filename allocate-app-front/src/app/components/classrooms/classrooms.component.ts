@@ -97,4 +97,14 @@ export class ClassroomsComponent implements OnInit {
     
     this.toggleTimetable();
   }
+
+  updateClassrooms(classrooms: Classroom[]) {
+    if (this.selectedClassroom !== null) {
+      this.editedClassroom.timeSlots = classrooms[0].timeSlots;
+    } else {
+      this.newClassroom.timeSlots = classrooms[0].timeSlots;
+    }
+
+    this.toggleTimetable();
+  }
 }

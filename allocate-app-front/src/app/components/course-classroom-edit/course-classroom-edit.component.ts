@@ -37,10 +37,8 @@ export class CourseClassroomEditComponent implements OnInit {
     this.selectedClassroom = null;
   }
 
-  removeClassroom(classroom) {
-    // remove classroom from classroomsAdded
+  removeClassroom(classroom: Classroom) {
     this.classroomsAdded = this.classroomsAdded.filter(classroomAdded => classroomAdded.name !== classroom.name);
-    // add classroom to classroomsAvailable
     this.classroomsAvailable.push(classroom);
   }
 

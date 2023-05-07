@@ -1,1 +1,60 @@
-<p>course-input works!</p>
+<div *ngIf="!showTable && !showClassrooms">
+  <div class="course-section modern">
+    <form class="course-form">
+      <div class="form-row">
+        <label for="course-name">Nome:</label>
+        <input type="text" id="course-name" [(ngModel)]="course.name" placeholder="APC - Turma 1" name="name">
+      </div>
+
+      <div class="form-row">
+        <label for="course-professor">Professor:</label>
+        <input type="text" id="course-professor" [(ngModel)]="course.professor" placeholder="José" name="professor">
+      </div>
+
+      <div class="form-row">
+        <label for="course-group-period">Código SIGAA:</label>
+        <input type="text" id="course-group-period" [(ngModel)]="course.groupPeriod" placeholder="246m34 235m12" name="groupPeriod"> 
+      </div>
+
+      <div class="form-row">
+        <label for="course-department">Departamento:</label>
+        <input type="text" id="course-department" [(ngModel)]="course.department" placeholder="Software" name="Department">
+      </div>
+
+      <div class="form-row">
+        <label for="course-local-threshold">Intervalo mínimo de dias entre aulas:</label>
+        <input type="number" id="course-local-threshold" [(ngModel)]="course.localthreshold" placeholder="Local threshold" name="localthreshold">
+      </div>
+
+      <div class="form-row">
+        <label for="course-time-slots">Salas (em que não pode acontecer):</label>
+        <div class="container">
+          <ng-container *ngFor="let classroom of course.classrooms">
+            <strong>{{ classroom.name }} </strong>
+          </ng-container>
+        </div>
+        <button class="light-button" type="button" (click)="openEditClassrooms(course.classrooms)">Editar Salas</button>
+      </div>
+
+      <div class="form-row">
+        <label for="course-time-slots">Turnos (em que não pode acontecer):</label>
+        <div class="container">
+          <strong>{{ this.course.timeSlots }}</strong>
+        </div>
+        <button class="light-button" (click)="openTimetable(course.timeSlots)">Editar Turnos</button>
+      </div>
+    </form>
+    <div class="button-row">
+      <button type="button" class="course-button remove-button" (click)="goBack()">Cancelar</button>
+      <button type="submit" class="course-button" (click)="sendSelection()">Confirmar</button>
+    </div>
+  </div>
+</div>
+
+<div *ngIf="showTable" class="timetable-container">
+  <app-timetable [timeSlots]="timeTableSlots" (changeTimeSlotsEvent)="updateTimeSlots($event)"></app-timetable>
+</div>
+
+<div *ngIf="showClassrooms">
+  <app-course-classroom-edit [classroomsAdded]="classrooms" (changeClassroomsEvent)="updateClassrooms($event)"></app-course-classroom-edit>
+</div>
