@@ -18,6 +18,7 @@ import { ClassroomsComponent } from './components/classrooms/classrooms.componen
 import { TimetableComponent } from './components/timetable/timetable.component';
 import { CourseClassroomEditComponent } from './components/course-classroom-edit/course-classroom-edit.component';
 import { CourseInputComponent } from './components/course-input/course-input.component';
+import { AllocateComponent } from './components/allocate/allocate.component';
 
 @NgModule({
   declarations: [
@@ -30,6 +31,7 @@ import { CourseInputComponent } from './components/course-input/course-input.com
     TimetableComponent,
     CourseClassroomEditComponent,
     CourseInputComponent,
+    AllocateComponent,
   ],
   imports: [
     BrowserAnimationsModule,

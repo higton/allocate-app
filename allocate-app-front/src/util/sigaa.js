@@ -1,4 +1,4 @@
-class SigaaHelper {
+export class SigaaHelper {
     static parseGroupPeriod(horario) {
         let inputs = horario.split(" ");
         let agrupamento = "";
@@ -26,5 +26,3 @@ class SigaaHelper {
     }
     
 }
-
-export default SigaaHelper;

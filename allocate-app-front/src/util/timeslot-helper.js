@@ -1,11 +1,31 @@
-class TimeSlotHelper {
-    
-    // the backend expects to pass the time slots where the class will be allocated
-    // but the user inputs the time slots where the class will not be allocated
-    // So this functions uses the input from the users and convert it to the format used by the backend
-    static invertTimeSlots(timeSlots) {
-    }
-    
-}
+import { tableData } from 'src/app/components/timetable/data.ts';
 
-export default TimeSlotHelper;
+export class TimeSlotHelper {
+    static getStandardTimeSlots() {
+        let standardTimeSlots = [];
+
+        for (let row of tableData) {
+            for (let cell of row.cells) {
+                standardTimeSlots.push(cell.id);
+            }
+        }
+
+        return standardTimeSlots;
+    }
+
+    static invertTimeSlots(timeSlots, standardTimeSlots) {
+        let result = [];
+
+        console.log("timeSlots: ", timeSlots);
+        console.log("standardTimeSlots: ", standardTimeSlots);
+        // iterate over the standard array of time slots
+        //  - if the time slot is not in the standard list of time slots, add it to the new array of time slots
+        standardTimeSlots.forEach(timeSlot => {
+            if (!timeSlots.includes(timeSlot)) {
+                result.push(timeSlot);
+            }
+        });
+    
+        return result;
+    }
+}
