@@ -25,7 +25,7 @@
       </div>
       <div class="navigation-buttons" *ngIf="!selectedCourse">
         <button class="navigation-button" (click)="navigateToClassrooms()">Voltar para a criação de salas</button>
-        <button class="navigation-button">Próximo passo!</button>
+        <button class="navigation-button" (click)="navigateToAllocate()" >Próximo passo!</button>
       </div>
     </div>
 

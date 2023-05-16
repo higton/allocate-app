@@ -4,9 +4,9 @@ export class TimeSlotHelper {
     static getStandardTimeSlots() {
         let standardTimeSlots = [];
 
-        for (let row of tableData) {
-            for (let cell of row.cells) {
-                standardTimeSlots.push(cell.id);
+        for (let i = 0; i < 6; i++) {
+            for (let row = 0; row < tableData.length; row++) {
+                standardTimeSlots.push(tableData[row].cells[i].id);
             }
         }
 

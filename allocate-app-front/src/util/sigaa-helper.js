@@ -24,5 +24,4 @@ export class SigaaHelper {
     
         return {total_aulas, agrupamento};
     }
-    
 }

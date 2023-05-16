@@ -22,7 +22,6 @@ pool.on('error', (err, client) => {
 init();
 
 async function init(){
-	// for each table modify the primary key to be a autoincrementing id
 	pool.query(`
 		CREATE TABLE IF NOT EXISTS COURSE (
 			id SERIAL PRIMARY KEY,
@@ -32,13 +31,14 @@ async function init(){
 			department VARCHAR(50) NOT NULL,
 			localthreshold INT NOT NULL,
 			time_slot VARCHAR(600) NOT NULL,
-			classrooms VARCHAR(600) NOT NULL
+			classrooms VARCHAR(600) NOT NULL,
+			semester_period VARCHAR(20) NOT NULL,
+			account_email VARCHAR(50) NOT NULL
 		)
 		`, (res, err) => {
 		console.log(res, err);
 	})
 
-	// email has to be unique
 	pool.query(`
 		CREATE TABLE IF NOT EXISTS ACCOUNT (
 			id SERIAL PRIMARY KEY,
@@ -54,7 +54,8 @@ async function init(){
 			id SERIAL PRIMARY KEY,
 			name VARCHAR(30) NOT NULL,
 			number_of_seats INT NOT NULL,
-			time_slot VARCHAR(500) NOT NULL
+			time_slot VARCHAR(500) NOT NULL,
+			account_email VARCHAR(50) NOT NULL
 		)
 	`, (res, err) => {
 		console.log(res, err);
@@ -62,32 +63,6 @@ async function init(){
 
 	// wait for the previous queries to finish
 	await new Promise(resolve => setTimeout(resolve, 5000));
-
-	pool.query(`
-		CREATE TABLE IF NOT EXISTS COURSES_ACCOUNT (
-			id SERIAL PRIMARY KEY,
-			fk_account_id INT NOT NULL,
-			fk_course_id INT NOT NULL,
-
-			FOREIGN KEY (fk_account_id) REFERENCES ACCOUNT (id),
-			FOREIGN KEY (fk_course_id) REFERENCES COURSE (id)
-		)
-		`, (res, err) => {
-		console.log(res, err);
-	})
-
-	pool.query(`
-		CREATE TABLE IF NOT EXISTS CLASSROOMS_ACCOUNT (
-			id SERIAL PRIMARY KEY,
-			fk_account_id INT NOT NULL,
-			fk_classroom_id INT NOT NULL,
-
-			FOREIGN KEY (fk_account_id) REFERENCES ACCOUNT (id),
-			FOREIGN KEY (fk_classroom_id) REFERENCES CLASSROOM (id)
-		)
-		`, (res, err) => {
-		console.log(res, err);
-	})
 }
 
 const saltRounds = 10;
@@ -108,21 +83,6 @@ async function getUser(email){
 	})
 	.catch((err) => {
 		return new Error(err);
-	})
-}
-
-async function getCoursesFromAccount(email){
-	return pool.query(`
-		SELECT name, professor, group_period, department, localthreshold, time_slot, classrooms
-		FROM COURSES_ACCOUNT
-		JOIN ACCOUNT ON ACCOUNT.id = fk_account_id
-		JOIN COURSE ON COURSE.id = fk_course_id
-		WHERE ACCOUNT.email = ($1)`,
-		[email]
-	).then((response) => {
-		return response.rows;
-	}).catch((error) => {
-		return new Error(error);
 	})
 }
 
@@ -184,25 +144,22 @@ async function changePassword(email, newPassword){
 	});
 };
 
-async function addCourse(name, professor, group_period, department, localthreshold, time_slot, classrooms){
-	return pool.query(`
-		INSERT INTO COURSE (name, professor, group_period, department, localthreshold, time_slot, classrooms)
-		VALUES ($1, $2, $3, $4, $5, $6, $7)`,
-		 [name, professor, group_period, department, localthreshold, time_slot, classrooms]
-	).then((response) => {
-		return "Course added!"
-	}).catch((error) => {
-		return new Error(error);
+async function getCoursesFromAccount(email){
+	return pool.query(
+		'SELECT * FROM COURSE WHERE account_email = ($1)', [email])
+	.then((response) => {
+		return response.rows;
 	})
-};
+	.catch((err) => {
+		return new Error(err);
+	})
+}
 
-async function addCourseToAccount(account_email, course_name){
+async function addCourseToAccount(account_email, name, professor, group_period, department, localthreshold, time_slot, classrooms, semester_period){
 	return pool.query(`
-		INSERT INTO COURSES_ACCOUNT (fk_account_id, fk_course_id)
-		SELECT ACCOUNT.id, COURSE.id FROM ACCOUNT, COURSE 
-		WHERE ACCOUNT.email = ($1)
-		AND COURSE.name = ($2)`,
-		 [account_email, course_name]
+		INSERT INTO COURSE (name, professor, group_period, department, localthreshold, time_slot, classrooms, semester_period, account_email)
+		VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9)`,
+		 [name, professor, group_period, department, localthreshold, time_slot, classrooms, semester_period, account_email]
 	).then((response) => {
 		return "Course added to user!"
 	}).catch((error) => {
@@ -212,9 +169,9 @@ async function addCourseToAccount(account_email, course_name){
 
 async function removeCourseFromAccount(account_email, course_name){
 	return pool.query(`
-		DELETE FROM COURSES_ACCOUNT
-		WHERE fk_account_id IN (SELECT id FROM ACCOUNT WHERE email = $1)
-		AND fk_course_id IN (SELECT id FROM COURSE WHERE name = $2)`,
+		DELETE FROM COURSE
+		WHERE name = ($2)
+		AND account_email = ($1)`,
 		 [account_email, course_name]
 	).then((response) => {
 		return "Course removed from user!"
@@ -223,76 +180,56 @@ async function removeCourseFromAccount(account_email, course_name){
 	})
 };
 
-async function editCourseFromAccount(account_email, course_id, new_name, new_professor, new_group_period, new_department, new_localthreshold, new_time_slot, new_classrooms){
+async function editCourseFromAccount(
+	account_email,
+	course_name,
+	new_name,
+	new_professor,
+	new_group_period,
+	new_department,
+	new_localthreshold,
+	new_time_slot,
+	new_classrooms,
+	new_semester_period
+){
 	return pool.query(`
 		UPDATE COURSE
-		SET name = ($3), professor = ($4), group_period = ($5), department = ($6), localthreshold = ($7), time_slot = ($8), classrooms = ($9)
-		WHERE id = ($2)
-		AND id IN (SELECT fk_course_id FROM COURSES_ACCOUNT WHERE fk_account_id IN (SELECT id FROM ACCOUNT WHERE email = ($1)))`,
-		 [account_email, course_id, new_name, new_professor, new_group_period, new_department, new_localthreshold, new_time_slot, new_classrooms]
+		SET name = ($2),
+		professor = ($3),
+		group_period = ($4),
+		department = ($5),
+		localthreshold = ($6),
+		time_slot = ($7),
+		classrooms = ($8),
+		semester_period = ($9)
+		WHERE name = ($1)
+		AND account_email = ($10)`,
+		 [course_name, new_name, new_professor, new_group_period, new_department, new_localthreshold, new_time_slot, new_classrooms, new_semester_period, account_email]
 	).then((response) => {
 		return "Course edited!"
 	}).catch((error) => {
 		return new Error(error);
-	})
+	});
 };
 
-async function addClassroom(name, number_of_seats, time_slot){
-	return pool.query(
-		'INSERT INTO CLASSROOM (name, number_of_seats, time_slot) VALUES ($1, $2, $3)',
-		 [name, number_of_seats, time_slot]
-	)
-	.then((response) => {
-		return "Classroom added!"
-	}).catch((error) => {
-		return new Error(error);
-	})
-};
-
-async function addClassroomToAccount(account_email, classrom_name){
+async function addClassroomToAccount(account_email, classrom_name, classroom_number_of_seats, classroom_time_slot){
 	return pool.query(`
-		INSERT INTO CLASSROOMS_ACCOUNT (fk_account_id, fk_classroom_id)
-		SELECT ACCOUNT.id, CLASSROOM.id FROM ACCOUNT, CLASSROOM
-		WHERE ACCOUNT.email = ($1)
-		AND CLASSROOM.name = ($2)`,
-		 [account_email, classrom_name]
+		INSERT INTO CLASSROOM (name, number_of_seats, time_slot, account_email)
+		VALUES ($1, $2, $3, $4)`,
+		 [classrom_name, classroom_number_of_seats, classroom_time_slot, account_email]
 	).then((response) => {
 		return "Classroom added to user!"
 	}).catch((error) => {
 		return new Error(error);
 	})
-};
+}
 
-async function removeClassroomFromAccount(account_email, classroom_id){
+async function removeClassroomFromAccount(account_email, classroom_name){
 	return pool.query(`
-		DELETE FROM CLASSROOMS_ACCOUNT
-		WHERE fk_account_id IN (SELECT id FROM ACCOUNT WHERE email = $1)
-		AND fk_classroom_id = $2`,
-		 [account_email, classroom_id]
-	).then((response) => {
-		return "Classroom removed from user!"
-	}).catch((error) => {
-		return new Error(error);
-	})
-};
-
-async function getClassroomIdFromAccount(account_email, classroom_name){
-	return pool.query(`
-		SELECT CLASSROOM.id FROM CLASSROOM
-		WHERE CLASSROOM.name = $1
-		AND CLASSROOM.id IN (SELECT fk_classroom_id FROM CLASSROOMS_ACCOUNT WHERE fk_account_id = (SELECT id FROM ACCOUNT WHERE email = $2))`,
-		 [classroom_name, account_email]
-	).then((response) => {
-		return response.rows[0].id;
-	}).catch((error) => {
-		return new Error(error);
-	})
-};
-
-async function removeClassroom(classroom_id){
-	return pool.query(`
-		DELETE FROM CLASSROOM WHERE id = $1`,
-		 [classroom_id]
+		DELETE FROM CLASSROOM
+		WHERE name = ($2)
+		AND account_email = ($1)`,
+		 [account_email, classroom_name]
 	).then((response) => {
 		return "Classroom removed from user!"
 	}).catch((error) => {
@@ -300,60 +237,32 @@ async function removeClassroom(classroom_id){
 	})
 }
 
-async function editClassroomFromAccount(account_email, classroom_name, new_number_of_seats, new_time_slot){
+async function editClassroomFromAccount(account_email, name, new_number_of_seats, new_time_slot){
 	return pool.query(`
 		UPDATE CLASSROOM
-			SET number_of_seats = $2, time_slot = $4
-		FROM CLASSROOMS_ACCOUNT
-		WHERE CLASSROOMS_ACCOUNT.fk_account_id = (SELECT id FROM ACCOUNT WHERE email = $3)
-		AND CLASSROOMS_ACCOUNT.fk_classroom_id = CLASSROOM.id
-		AND CLASSROOM.name = $1`,
-		 [classroom_name, new_number_of_seats, account_email, new_time_slot]
+		SET number_of_seats = ($3),
+		time_slot = ($4)
+		WHERE name = ($2)
+		AND account_email = ($1)`,
+		 [account_email, name, new_number_of_seats, new_time_slot]
 	).then((response) => {
-		return "Classroom edited from user!"
+		return "Classroom edited!"
 	}).catch((error) => {
-		console.log(error);
 		return new Error(error);
-	})
-};
+	});
+}
 
 async function getClassroomsFromAccount(account_email){
 	return pool.query(`
-		SELECT CLASSROOM.name, CLASSROOM.number_of_seats, CLASSROOM.time_slot
-		FROM CLASSROOM, CLASSROOMS_ACCOUNT
-		WHERE CLASSROOMS_ACCOUNT.fk_account_id = (SELECT id FROM ACCOUNT WHERE email = ($1))
-		AND CLASSROOMS_ACCOUNT.fk_classroom_id = CLASSROOM.id`,
+		SELECT * FROM CLASSROOM
+		WHERE account_email = ($1)`,
 		 [account_email]
 	).then((response) => {
 		return response.rows;
 	}).catch((error) => {
 		return new Error(error);
 	})
-};
-
-async function removeCourse(course_id){
-	return pool.query(`
-		DELETE FROM COURSE WHERE id = $1`,
-		 [course_id]
-	).then((response) => {
-		return "Course removed from user!"
-	}).catch((error) => {
-		return new Error(error);
-	})
-};
-
-async function getCourseIdFromAccount(account_email, course_name){
-	return pool.query(`
-		SELECT COURSE.id FROM COURSE
-		WHERE COURSE.name = $1
-		AND COURSE.id IN (SELECT fk_course_id FROM COURSES_ACCOUNT WHERE fk_account_id = (SELECT id FROM ACCOUNT WHERE email = $2))`,
-		 [course_name, account_email]
-	).then((response) => {
-		return response.rows[0].id;
-	}).catch((error) => {
-		return new Error(error);
-	})
-};
+}
 
 module.exports = {
 	getUsers,
@@ -362,17 +271,11 @@ module.exports = {
 	createUser,
 	isCorrectPassword,
 	changePassword,
-	addCourse,
 	addCourseToAccount,
 	removeCourseFromAccount,
 	editCourseFromAccount,
-	addClassroom,
 	addClassroomToAccount,
 	removeClassroomFromAccount,
 	editClassroomFromAccount,
 	getClassroomsFromAccount,
-	getClassroomIdFromAccount,
-	removeClassroom,
-	removeCourse,
-	getCourseIdFromAccount,
 };

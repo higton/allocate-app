@@ -5,7 +5,9 @@ import { DomSanitizer, SafeHtml } from '@angular/platform-browser';
 import { UserService } from 'src/app/services/user.service';
 import { AuthService } from '../../auth/services/auth.service';
 import { TimeSlotHelper } from 'src/util/timeslot-helper';
+import { SigaaHelper } from 'src/util/sigaa-helper';
 import { Classroom } from 'src/app/models/Classroom';
+import { Course } from 'src/app/models/Course';
 
 @Component({
   selector: 'app-allocate',
@@ -25,9 +27,13 @@ export class AllocateComponent implements OnInit {
 
   openEnsaleitor() {
     let classrooms:Classroom[] = [];
+    let courses:any[] = [];
+
+    const standardTimeslots = TimeSlotHelper.getStandardTimeSlots();
+    const standardClassrooms = this.userService.classroomsList;
 
     for (let classroom of this.userService.classroomsList) {
-      let standardTimeslots = TimeSlotHelper.getStandardTimeSlots();
+      
       classrooms.push({
         name: classroom.name,
         numberOfSeats: classroom.numberOfSeats,
@@ -35,11 +41,28 @@ export class AllocateComponent implements OnInit {
       });
     }
 
+    for (let course of this.userService.coursesList) {
+      let {total_aulas, agrupamento} = SigaaHelper.parseGroupPeriod(course.groupPeriod);
+
+      courses.push({
+        name: course.name,
+        professor: course.professor,
+        groupPeriod: course.groupPeriod,
+        department: course.department,
+        localthreshold: 80,
+        timeSlots: TimeSlotHelper.invertTimeSlots(course.timeSlots, standardTimeslots),
+        grouping: agrupamento,
+        totalClasses: total_aulas,
+        classrooms: course.classrooms,
+        semesterPeriod: course.semesterPeriod,
+      });
+    }
+
     console.log(classrooms);
     
     const url = `http://localhost:3000`;
 
-    const body = { classrooms: classrooms, output: "output" };
+    const body = { classrooms: classrooms, courses: courses, output: "output" };
 
     this.http.post(url, body, {
       headers: {
@@ -59,4 +82,8 @@ export class AllocateComponent implements OnInit {
       }
     );
   }
+}
+
+function objectNameExists(name: string, list: Course[] | Classroom[]) {
+  return list.some(obj => obj.name === name);
 }

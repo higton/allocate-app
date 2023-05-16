@@ -26,6 +26,7 @@ let UserSchema = buildSchema(`
     localthreshold: Int,
     time_slot: String,
     classrooms: String,
+    semester_period: String,
   }
   type Classroom {
     name: String,
@@ -59,7 +60,8 @@ let UserSchema = buildSchema(`
       localthreshold: Int!, 
       time_slot: String!, 
       classrooms: String!, 
-      account_email: String!
+      account_email: String!,
+      semester_period: String!
     ): String,
     removeCourseFromAccount(
       course_name: String!, 
@@ -74,7 +76,8 @@ let UserSchema = buildSchema(`
       new_department: String!, 
       new_localthreshold: Int!, 
       new_time_slot: String!, 
-      new_classrooms: String!
+      new_classrooms: String!,
+      new_semester_period: String!
     ): String,
     addClassroomToAccount(
       classroom_name: String!, 
@@ -164,10 +167,6 @@ const rootResolver = {
     return user;
   },
 
-  getCoursesFromAccount: async ({email}, req) => {
-    return await db.getCoursesFromAccount(email);
-  },
-
   addUser: async ({ email, password }) => {
     return await db.createUser({
       email: email,
@@ -211,7 +210,22 @@ const rootResolver = {
     }
   },
 
-  addCourseToAccount: async ({ name, professor, group_period, department, localthreshold, time_slot, classrooms, account_email }, req) => {
+  getCoursesFromAccount: async ({email}, req) => {
+    return await db.getCoursesFromAccount(email);
+  },
+
+  addCourseToAccount: async (
+    { 
+      name, 
+      professor, 
+      group_period, 
+      department, 
+      localthreshold, 
+      time_slot, 
+      classrooms, 
+      account_email,
+      semester_period
+    }, req) => {
     await checkToken(req)
       .then((result) => {
         userData = result;
@@ -219,10 +233,8 @@ const rootResolver = {
       .catch((err) => {
         return new Error("It is necessary to login")
       });
-    
-    await db.addCourse(name, professor, group_period, department, localthreshold, time_slot, classrooms);
 
-    return await db.addCourseToAccount(account_email, name);
+    return await db.addCourseToAccount(account_email, name, professor, group_period, department, localthreshold, time_slot, classrooms, semester_period);
   },
 
   removeCourseFromAccount: async ({ account_email, course_name }, req) => {
@@ -234,9 +246,8 @@ const rootResolver = {
         return new Error("It is necessary to login")
       });
     
-    course_id = await db.getCourseIdFromAccount(account_email, course_name);
-    await db.removeCourseFromAccount(account_email, course_name);
-    return await db.removeCourse(course_id);
+     
+    return await db.removeCourseFromAccount(account_email, course_name);
   },
 
   editCourseFromAccount: async (
@@ -245,11 +256,12 @@ const rootResolver = {
       course_name, 
       new_course_name, 
       new_professor, 
-      new_group_period, 
+      new_group_period,
       new_department, 
       new_localthreshold, 
       new_time_slot,
-      new_classrooms
+      new_classrooms,
+      new_semester_period
     }, req) => {
     await checkToken(req)
       .then((result) => {
@@ -259,9 +271,18 @@ const rootResolver = {
         return new Error("It is necessary to login")
       });
     
-    let course_id = await db.getCourseIdFromAccount(account_email, course_name);
-
-    return await db.editCourseFromAccount(account_email, course_id, new_course_name, new_professor, new_group_period, new_department, new_localthreshold, new_time_slot, new_classrooms);
+    return await db.editCourseFromAccount(
+      account_email,
+      course_name,
+      new_course_name, 
+      new_professor, 
+      new_group_period, 
+      new_department, 
+      new_localthreshold, 
+      new_time_slot, 
+      new_classrooms,
+      new_semester_period
+      );
   },
 
   addClassroomToAccount: async ({ classroom_name, classroom_number_of_seats, time_slot, account_email }, req) => {
@@ -272,10 +293,8 @@ const rootResolver = {
       .catch((err) => {
         return new Error("It is necessary to login")
       });
-    
-    await db.addClassroom(classroom_name, classroom_number_of_seats, time_slot);
 
-    return await db.addClassroomToAccount(account_email, classroom_name, classroom_number_of_seats);
+    return await db.addClassroomToAccount(account_email, classroom_name, classroom_number_of_seats, time_slot);
   },
 
   removeClassroomFromAccount: async ({ account_email, classroom_name }, req) => {
@@ -286,10 +305,8 @@ const rootResolver = {
       .catch((err) => {
         return new Error("It is necessary to login")
       });
-    
-    classroom_id = await db.getClassroomIdFromAccount(account_email, classroom_name);
-    await db.removeClassroomFromAccount(account_email, classroom_id);
-    return await db.removeClassroom(classroom_id);
+
+    return await db.removeClassroomFromAccount(account_email, classroom_name);
   },
 
   editClassroomFromAccount: async ({ account_email, classroom_name, classroom_number_of_seats, classroom_time_slot }, req) => {

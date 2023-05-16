@@ -39,7 +39,8 @@ export class CoursesComponent implements OnInit {
       department: '',
       localthreshold: 0,
       timeSlots: [],
-      classrooms: []
+      classrooms: [],
+      semesterPeriod: 1,
     };
     
   }
@@ -53,7 +54,7 @@ export class CoursesComponent implements OnInit {
   async addCourseToAccount(newCourse: Course) {
     let account_email = await this.authService.getEmail();
 
-    if (newCourse.name && newCourse.professor && newCourse.groupPeriod && newCourse.department) {
+    if (newCourse.name && newCourse.professor && newCourse.groupPeriod && newCourse.department && newCourse.semesterPeriod) {
       await this.userService.addCourseToAccount(newCourse, account_email);
     }
   }
@@ -102,5 +103,9 @@ export class CoursesComponent implements OnInit {
 
   toggleShowList() {
     this.showList = !this.showList;
+  }
+
+  navigateToAllocate() {
+    this.router.navigateByUrl('/home/allocate');
   }
 }

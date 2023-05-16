@@ -4,8 +4,6 @@ import { Subject, Observable } from 'rxjs';
 import { ServerService } from '../auth/services/server.service';
 import { Course } from 'src/app/models/Course';
 import { Classroom } from 'src/app/models/Classroom';
-import TimeSlotHelper from 'src/util/timeslot-helper';
-import SigaaHelper from 'src/util/sigaa';
 
 @Injectable({
   providedIn: 'root'
@@ -34,7 +32,9 @@ export class UserService {
         $localthreshold: Int!, 
         $time_slot: String!, 
         $classrooms: String!, 
-        $account_email: String!) {
+        $account_email: String!,
+        $semester_period: String!
+        ) {
           addCourseToAccount(
             name: $name, 
             professor: $professor, 
@@ -43,7 +43,8 @@ export class UserService {
             localthreshold: $localthreshold, 
             time_slot: $time_slot, 
             classrooms: $classrooms, 
-            account_email: $account_email
+            account_email: $account_email,
+            semester_period: $semester_period
           )
         }`;
     
@@ -60,6 +61,7 @@ export class UserService {
             time_slot: newCourse.timeSlots.join(','),
             classrooms: classrooms,
             account_email,
+            semester_period: newCourse.semesterPeriod.toString(),
           },
         })
       ).subscribe((response: any) => {
@@ -82,7 +84,8 @@ export class UserService {
           department,
           localthreshold,
           time_slot,
-          classrooms
+          classrooms,
+          semester_period
         }
       }
     `;
@@ -123,6 +126,7 @@ export class UserService {
               localthreshold: course.localthreshold,
               timeSlots,
               classrooms: newClassrooms,
+              semesterPeriod: course.semester_period,
             };
             this.coursesList.push(newCourse);
           });
@@ -159,6 +163,11 @@ export class UserService {
   }
 
   editCourseFromAccount(newCourse: Course, account_email: String, oldCourseName: String) {
+    // if a course with the same name already exists, do nothing
+    if (this.coursesList.find((course) => course.name === newCourse.name)) {
+      return;
+    }
+
     let classrooms = newCourse.classrooms.map((classroom) => classroom.name).join(',');
 
     const query = `
@@ -171,7 +180,9 @@ export class UserService {
         $new_localthreshold: Int!, 
         $new_time_slot: String!, 
         $account_email: String!,
-        $new_classrooms: String!) {
+        $new_classrooms: String!,
+        $new_semester_period: String!
+        ) {
           editCourseFromAccount(
             course_name: $course_name, 
             new_course_name: $new_course_name, 
@@ -181,7 +192,8 @@ export class UserService {
             new_localthreshold: $new_localthreshold, 
             new_time_slot: $new_time_slot, 
             account_email: $account_email,
-            new_classrooms: $new_classrooms
+            new_classrooms: $new_classrooms,
+            new_semester_period: $new_semester_period
           )
         }
     `;
@@ -200,6 +212,7 @@ export class UserService {
             new_time_slot: newCourse.timeSlots.join(','),
             new_classrooms: classrooms,
             account_email,
+            new_semester_period: newCourse.semesterPeriod.toString(),
           },
         })
       ).subscribe((response: any) => {

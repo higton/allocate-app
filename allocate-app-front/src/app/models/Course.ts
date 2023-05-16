@@ -8,4 +8,5 @@ export class Course {
     localthreshold: Number;
     timeSlots: string[];
     classrooms: Classroom[];
+    semesterPeriod: Number;
 }

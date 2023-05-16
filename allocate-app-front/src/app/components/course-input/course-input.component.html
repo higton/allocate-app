@@ -17,17 +17,22 @@
       </div>
 
       <div class="form-row">
+        <label for="course-group-period">Semestre da disciplina (periodo):</label>
+        <input type="number" id="course-semester-period" [(ngModel)]="course.semesterPeriod" min="1" max="20" value="1" name="semesterPeriod"> 
+      </div>
+
+      <div class="form-row">
         <label for="course-department">Departamento:</label>
         <input type="text" id="course-department" [(ngModel)]="course.department" placeholder="Software" name="Department">
       </div>
 
-      <div class="form-row">
+      <!-- <div class="form-row">
         <label for="course-local-threshold">Intervalo mínimo de dias entre aulas:</label>
         <input type="number" id="course-local-threshold" [(ngModel)]="course.localthreshold" placeholder="Local threshold" name="localthreshold">
-      </div>
+      </div> -->
 
       <div class="form-row">
-        <label for="course-time-slots">Salas (em que não pode acontecer):</label>
+        <label for="course-time-slots">Salas:</label>
         <div class="container">
           <ng-container *ngFor="let classroom of course.classrooms">
             <strong>{{ classroom.name }} </strong>
