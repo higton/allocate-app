@@ -8,7 +8,7 @@
           <div *ngIf="item === selectedCourse">
             <app-course-input 
               [course]="selectedCourse" 
-              (changeCourseEvent)="updateSelectedCourse($event)" 
+              (changeCourseEvent)="editCourse($event)" 
               (cancelEvent)="cancelEditing()"></app-course-input>
           </div>
           <div *ngIf="!selectedCourse" class="form-row">

@@ -3,3 +3,4 @@ node_modules/
 
 # Production directories
 dist/
+.vercel

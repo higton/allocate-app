@@ -15,12 +15,13 @@ import { Course } from 'src/app/models/Course';
   styleUrls: ['./allocate.component.css']
 })
 export class AllocateComponent implements OnInit {
-  htmlContent: SafeHtml;
+  htmlResponse: SafeHtml;
 
   constructor(
     public userService: UserService,
     public authService: AuthService,
     private http: HttpClient,
+    private sanitizer: DomSanitizer
   ) { }
 
   ngOnInit(): void {}
@@ -49,7 +50,7 @@ export class AllocateComponent implements OnInit {
         professor: course.professor,
         groupPeriod: course.groupPeriod,
         department: course.department,
-        localthreshold: 80,
+        localthreshold: 10,
         timeSlots: TimeSlotHelper.invertTimeSlots(course.timeSlots, standardTimeslots),
         grouping: agrupamento,
         totalClasses: total_aulas,
@@ -76,6 +77,7 @@ export class AllocateComponent implements OnInit {
         const parser = new DOMParser();
         const doc = parser.parseFromString(response, 'text/html');
         console.log("Parsed HTML document:", doc);
+        this.htmlResponse = this.sanitizer.bypassSecurityTrustHtml(response);
       },
       (error) => {
         console.log("Error during POST request", error);

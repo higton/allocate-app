@@ -1,0 +1,17 @@
+.modern {
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    color: #333;
+  }
+  
+  .modern h2 {
+    font-weight: 600;
+    font-size: 32px;
+    margin-bottom: 20px;
+  }
+  
+  .algorithms-section {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    padding: 20px;
+  }

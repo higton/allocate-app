@@ -163,11 +163,6 @@ export class UserService {
   }
 
   editCourseFromAccount(newCourse: Course, account_email: String, oldCourseName: String) {
-    // if a course with the same name already exists, do nothing
-    if (this.coursesList.find((course) => course.name === newCourse.name)) {
-      return;
-    }
-
     let classrooms = newCourse.classrooms.map((classroom) => classroom.name).join(',');
 
     const query = `

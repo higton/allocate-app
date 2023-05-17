@@ -91,10 +91,6 @@ export class CoursesComponent implements OnInit {
     this.router.navigateByUrl('/home/classrooms');
   }
 
-  updateSelectedCourse(course: Course) {
-    this.editCourse(course);
-  }
-
   updateNewCourse(course: Course) {
     this.addCourseToAccount(course);
 
