@@ -11,13 +11,11 @@ export class TimetableComponent implements OnInit {
   @Output() changeTimeSlotsEvent = new EventEmitter();
 
   selectedCells: string[] = [];
-  tableData = [];
+  tableData = JSON.parse(JSON.stringify(tableData)); // deep copy
 
   constructor() { }
 
   ngOnInit(): void {
-    this.tableData = JSON.parse(JSON.stringify(tableData)); // deep copy
-
     this.selectCells(this.timeSlots);
   }
 

@@ -32,7 +32,11 @@ export class CourseClassroomEditComponent implements OnInit {
       return;
     }
 
-    this.classroomsAvailable = this.classroomsAvailable.filter(classroomAvailable => classroomAvailable.name !== this.selectedClassroom.name);
+    this.classroomsAvailable = this.classroomsAvailable.filter(classroomAvailable => {
+      if (this.selectedClassroom) {
+        classroomAvailable.name !== this.selectedClassroom.name
+      }
+    });
     this.classroomsAdded.push(this.selectedClassroom);
     this.selectedClassroom = null;
   }

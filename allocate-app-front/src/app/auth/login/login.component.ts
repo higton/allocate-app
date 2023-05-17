@@ -6,7 +6,6 @@ import { BehaviorSubject } from 'rxjs';
 import { AuthService } from '../services/auth.service';
 import { UserService } from '../../services/user.service';
 import { ServerService } from '../services/server.service';
-import { tokenName } from '@angular/compiler';
 
 @Component({
   selector: 'app-login',
@@ -14,7 +13,7 @@ import { tokenName } from '@angular/compiler';
   styleUrls: ['./login.component.css']
 })
 export class LoginComponent implements OnInit {
-  showErrorMessage: String;
+  showErrorMessage: string = '';
 
   private loggedIn = new BehaviorSubject<boolean>(false);
 
@@ -41,15 +40,16 @@ export class LoginComponent implements OnInit {
     }
   }
 
-  async checkIfEmailExist(email: String){
+  async checkIfEmailExist(email: String): Promise<string> {
       return  await this.authService.isEmailExistent(email)
-      .then((isEmailUsed:any) => {
-        if(!isEmailUsed) {
-          return 'This account does not exist';
-        }
-      })
-      .catch((error:any) => {
-        return this.authService.translateErrorMessage(error);
-      })
+        .then((isEmailUsed:any) => {
+          if(!isEmailUsed) {
+            return 'This account does not exist';
+          }
+          return '';
+        })
+        .catch((error:any) => {
+          return this.authService.translateErrorMessage(error);
+        })
   }
 }

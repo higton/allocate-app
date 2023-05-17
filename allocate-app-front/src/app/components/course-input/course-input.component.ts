@@ -9,21 +9,19 @@ import { Classroom } from 'src/app/models/Classroom';
   styleUrls: ['./course-input.component.css']
 })
 export class CourseInputComponent implements OnInit {
-  @Input() course: Course;
+  @Input() course: Course = new Course();
   @Output() changeCourseEvent = new EventEmitter<Course>();
   @Output() cancelEvent = new EventEmitter<void>();
 
   showTable: boolean = false;
   showClassrooms: boolean = false;
-  timeTableSlots: String[];
-  classrooms: Classroom[];
-  copyCourse: Course;
+  timeTableSlots: String[] = [];
+  classrooms: Classroom[] = [];
+  copyCourse: Course = JSON.parse(JSON.stringify(this.course));
 
   constructor() { }
 
   ngOnInit(): void {
-    // deep copy of the course
-    this.copyCourse = JSON.parse(JSON.stringify(this.course));
   }
 
   openTimetable(timeSlots: string[]) {

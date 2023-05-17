@@ -9,7 +9,7 @@ import { UserService } from '../../services/user.service';
   styleUrls: ['./signin.component.css']
 })
 export class SigninComponent implements OnInit {
-  showErrorMessage: String;
+  showErrorMessage: String = '';
 
   constructor(
     public authService: AuthService,

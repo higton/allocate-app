@@ -1,5 +1,5 @@
 export class Classroom {
-    name: string;
-    numberOfSeats: number;
-    timeSlots: string[];
+    name: string = '';
+    numberOfSeats: number = 0;
+    timeSlots: string[] = [];
 }

@@ -11,11 +11,15 @@ import { Classroom } from 'src/app/models/Classroom';
   styleUrls: ['./classrooms.component.css']
 })
 export class ClassroomsComponent implements OnInit {
-  newClassroom: Classroom;
-  selectedClassroom: Classroom = null;
-  editedClassroom: Classroom | null = null;
+  newClassroom: Classroom = {
+    name: '',
+    numberOfSeats: 0,
+    timeSlots: [],
+  };
+  selectedClassroom: Classroom | null = null;
+  editedClassroom: Classroom = { ...this.newClassroom }
   showTable: boolean = false;
-  timeTableSlots: String[];
+  timeTableSlots: String[] = [];
 
   constructor(
     public userService: UserService,
@@ -24,11 +28,7 @@ export class ClassroomsComponent implements OnInit {
   ) { }
 
   ngOnInit(): void {
-    this.newClassroom = {
-      name: '',
-      numberOfSeats: 0,
-      timeSlots: [],
-    };
+    this.newClassroom
   }
 
   async addClassroomToAccount() {
@@ -89,7 +89,7 @@ export class ClassroomsComponent implements OnInit {
   }
 
   updateTimeSlots(timeSlots: string[]) {
-    if (this.selectedClassroom !== null) {
+    if (this.selectedClassroom !== null && this.editedClassroom) {
       this.editedClassroom.timeSlots = timeSlots;
     } else {
       this.newClassroom.timeSlots = timeSlots;
@@ -99,7 +99,7 @@ export class ClassroomsComponent implements OnInit {
   }
 
   updateClassrooms(classrooms: Classroom[]) {
-    if (this.selectedClassroom !== null) {
+    if (this.selectedClassroom !== null && this.editedClassroom) {
       this.editedClassroom.timeSlots = classrooms[0].timeSlots;
     } else {
       this.newClassroom.timeSlots = classrooms[0].timeSlots;

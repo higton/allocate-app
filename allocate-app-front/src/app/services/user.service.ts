@@ -100,7 +100,7 @@ export class UserService {
         (response: any) => {
           this.coursesList = [];
           
-          response.data.getCoursesFromAccount.forEach((course) => {
+          response.data.getCoursesFromAccount.forEach((course:any) => {
             const timeSlots = course.time_slot.split(',');
             let classrooms = [];
 
@@ -108,7 +108,7 @@ export class UserService {
               classrooms = course.classrooms.split(',');
             }
 
-            const newClassrooms:Classroom[] = classrooms.map((classroomName) => { 
+            const newClassrooms:Classroom[] = classrooms.map((classroomName:any) => { 
               const classroomObj = this.classroomsList.find((classroomObj) => classroomObj.name === classroomName);
 
               return {
@@ -162,7 +162,7 @@ export class UserService {
     });
   }
 
-  editCourseFromAccount(newCourse: Course, account_email: String, oldCourseName: String) {
+  editCourseFromAccount(newCourse: Course, account_email: String) {
     let classrooms = newCourse.classrooms.map((classroom) => classroom.name).join(',');
 
     const query = `
@@ -198,7 +198,7 @@ export class UserService {
         JSON.stringify({
           query,
           variables: {
-            course_name: oldCourseName,
+            course_name: newCourse.name,
             new_course_name: newCourse.name,
             new_professor: newCourse.professor,
             new_group_period: newCourse.groupPeriod,
@@ -213,10 +213,7 @@ export class UserService {
       ).subscribe((response: any) => {
         // update course in coursesList
         this.coursesList = this.coursesList.map((course) => {
-          if (course.name === oldCourseName) {
-            return newCourse;
-          }
-          return course;
+          return newCourse;
         });
 
         resolve();
@@ -354,7 +351,7 @@ export class UserService {
       ).subscribe((response: any) => {
         let classrooms = response.data.getClassroomsFromAccount;
         
-        this.classroomsList = classrooms.map((classroom) => {
+        this.classroomsList = classrooms.map((classroom:any) => {
           return {
             name: classroom.name,
             numberOfSeats: classroom.number_of_seats,

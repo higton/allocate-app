@@ -4,7 +4,7 @@ import { DomSanitizer, SafeHtml } from '@angular/platform-browser';
 
 import { UserService } from 'src/app/services/user.service';
 import { AuthService } from '../../auth/services/auth.service';
-import { TimeSlotHelper } from 'src/util/timeslot-helper';
+import { TimeslotHelper } from 'src/util/timeslot-helper';
 import { SigaaHelper } from 'src/util/sigaa-helper';
 import { Classroom } from 'src/app/models/Classroom';
 import { Course } from 'src/app/models/Course';
@@ -15,7 +15,7 @@ import { Course } from 'src/app/models/Course';
   styleUrls: ['./allocate.component.css']
 })
 export class AllocateComponent implements OnInit {
-  htmlResponse: SafeHtml;
+  htmlResponse: SafeHtml = '';
 
   constructor(
     public userService: UserService,
@@ -30,7 +30,7 @@ export class AllocateComponent implements OnInit {
     let classrooms:Classroom[] = [];
     let courses:any[] = [];
 
-    const standardTimeslots = TimeSlotHelper.getStandardTimeSlots();
+    const standardTimeslots = TimeslotHelper.getStandardTimeSlots();
     const standardClassrooms = this.userService.classroomsList;
 
     for (let classroom of this.userService.classroomsList) {
@@ -38,7 +38,7 @@ export class AllocateComponent implements OnInit {
       classrooms.push({
         name: classroom.name,
         numberOfSeats: classroom.numberOfSeats,
-        timeSlots: TimeSlotHelper.invertTimeSlots(classroom.timeSlots, standardTimeslots),
+        timeSlots: TimeslotHelper.invertTimeSlots(classroom.timeSlots, standardTimeslots),
       });
     }
 
@@ -51,7 +51,7 @@ export class AllocateComponent implements OnInit {
         groupPeriod: course.groupPeriod,
         department: course.department,
         localthreshold: 10,
-        timeSlots: TimeSlotHelper.invertTimeSlots(course.timeSlots, standardTimeslots),
+        timeSlots: TimeslotHelper.invertTimeSlots(course.timeSlots, standardTimeslots),
         grouping: agrupamento,
         totalClasses: total_aulas,
         classrooms: course.classrooms,

@@ -8,7 +8,7 @@ const baseUrl = 'http://localhost:4000';
 })
 export class ServerService {
   private loggedIn = false;
-  private token: string;
+  private token: string|undefined;
 
   constructor(private http: HttpClient) {}
 
@@ -25,7 +25,7 @@ export class ServerService {
     if (method === 'GET') {
       return this.get(route, data);
     }
-    let header = {};
+    let header:any = undefined;
 
     if(route === '/graphql'){
       header = {

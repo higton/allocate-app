@@ -9,13 +9,13 @@ import { ServerService } from './server.service';
 })
 export class AuthService {
   private loggedIn = new BehaviorSubject<boolean>(false);
-  private token: string;
-  public user: {
+  private token?: string;
+  public user?: {
     email: String,
   };
   
   // store the URL so we can redirect after logging in
-  redirectUrl: string;
+  redirectUrl: string = '/';
 
   get isLoggedIn() {
     return this.loggedIn.asObservable();
@@ -162,7 +162,7 @@ export class AuthService {
     return this.server.request('GET', '/checkToken')
   }
 
-  isLogged(url): any {
+  isLogged(url: string): any {
     return new Promise((resolve, reject) => {
       this.server.request('GET', '/checkToken')
         .subscribe(
@@ -251,12 +251,14 @@ export class AuthService {
     });
   }
 
-  translateErrorMessage(error: any){
+  translateErrorMessage(error: any): string {
     if(error.statusText === "Unauthorized"){
       return 'Wrong password';
     }
     if(error.statusText === "Unknown Error"){
       return 'No connection with the server';
     }
+
+    return error.statusText;
   }
 }

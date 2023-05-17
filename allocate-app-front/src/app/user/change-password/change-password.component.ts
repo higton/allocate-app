@@ -7,8 +7,8 @@ import { AuthService } from '../../auth/services/auth.service';
   styleUrls: ['./change-password.component.css']
 })
 export class ChangePasswordComponent implements OnInit {
-  showErrorMessage: String;
-  showSuccessMessage: String;
+  showErrorMessage: string = '';
+  showSuccessMessage: String = '';
 
   constructor(public authService: AuthService) { }
 
@@ -18,13 +18,13 @@ export class ChangePasswordComponent implements OnInit {
   async changePassword(oldPassword: String, newPassword: String, reEnterPassword: String){
     this.showErrorMessage = '';
     let email:String = await this.authService.getEmail();
-    let isCorrectPassword = false;
+    let isCorrectPassword:boolean = false;
 
     if(newPassword !== reEnterPassword){
       this.showErrorMessage = 'The passwords do not match';
     } else {
     	await this.authService.isCorrectPassword(oldPassword)
-        .then(async (result:boolean) => {
+        .then(async (result:any) => {
           isCorrectPassword = result;
 
           if(!isCorrectPassword){

@@ -12,13 +12,13 @@ import { Classroom } from 'src/app/models/Classroom';
   styleUrls: ['./courses.component.css']
 })
 export class CoursesComponent implements OnInit {
-  selectedCourse: Course = null;
-  newCourse: Course = null;
+  selectedCourse: Course | null = null;
+  newCourse: Course | null = null;
   showTable: boolean = false;
   showClassrooms: boolean = false;
-  timeTableSlots: String[];
-  classrooms: Classroom[];
-  editedCourse: Course = null;
+  timeTableSlots: String[] = [];
+  classrooms: Classroom[] = [];
+  editedCourse: Course | null = null;
   showList: boolean = true;
 
   constructor(
@@ -84,7 +84,7 @@ export class CoursesComponent implements OnInit {
 
     let account_email:String = await this.authService.getEmail();
 
-    this.userService.editCourseFromAccount(course, account_email, this.editedCourse.name);
+    this.userService.editCourseFromAccount(course, account_email);
   }
 
   navigateToClassrooms() {
