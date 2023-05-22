@@ -10,6 +10,7 @@ import { Classroom } from 'src/app/models/Classroom';
 })
 export class CourseInputComponent implements OnInit {
   @Input() course: Course = new Course();
+  @Input() type: string = "insert";
   @Output() changeCourseEvent = new EventEmitter<Course>();
   @Output() cancelEvent = new EventEmitter<void>();
 
@@ -57,7 +58,19 @@ export class CourseInputComponent implements OnInit {
   }
 
   sendSelection() {
-    this.changeCourseEvent.emit(this.course);
+    // if all obligatory fields are filled
+    if (
+      this.course.name && 
+      this.course.classrooms.length > 0 && 
+      this.course.department && 
+      this.course.groupPeriod &&
+      this.course.professor &&
+      this.course.semesterPeriod) 
+    {
+      this.changeCourseEvent.emit(this.course);
+    } else {
+      alert("Por favor, preencha todos os campos obrigatórios.");
+    }
   }
 
   goBack() {

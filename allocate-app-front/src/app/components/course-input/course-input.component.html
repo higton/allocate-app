@@ -3,7 +3,8 @@
     <form class="course-form">
       <div class="form-row">
         <label for="course-name">Nome:</label>
-        <strong>{{ course.name }}</strong>
+        <input *ngIf="type === 'insert'" type="text" id="course-name" [(ngModel)]="course.name" placeholder="APC 1 - Turma 1" name="name">
+        <strong *ngIf="type === 'edit'">{{ course.name }}</strong>
       </div>
 
       <div class="form-row">

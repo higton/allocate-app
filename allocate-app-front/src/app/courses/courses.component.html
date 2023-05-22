@@ -7,7 +7,8 @@
         <div class="courses-section modern">
           <div *ngIf="item === selectedCourse">
             <app-course-input 
-              [course]="selectedCourse" 
+              [course]="selectedCourse"
+              [type]="'edit'"
               (changeCourseEvent)="editCourse($event)" 
               (cancelEvent)="cancelEditing()"></app-course-input>
           </div>
@@ -33,6 +34,7 @@
       <h2>Adicionar disciplina</h2>
       <app-course-input 
         [course]="newCourse" 
+        [type]="'insert'"
         (changeCourseEvent)="updateNewCourse($event)" 
         (cancelEvent)="toggleShowList()"></app-course-input>
     </div>
