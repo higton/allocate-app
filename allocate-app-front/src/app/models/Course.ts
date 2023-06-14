@@ -1,6 +1,7 @@
 import { Classroom } from "./Classroom";
 
 export class Course {
+    id: Number = 0;
     name: string = '';
     professor: string = '';
     groupPeriod: string = '';

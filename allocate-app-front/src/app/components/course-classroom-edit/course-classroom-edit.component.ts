@@ -21,7 +21,6 @@ export class CourseClassroomEditComponent implements OnInit {
   ngOnInit(): void {
     this.copyClassroomsAdded = JSON.parse(JSON.stringify(this.classroomsAdded));
 
-    // the classrooms availables should be all the classrooms minus the classrooms added
     this.classroomsAvailable = this.userService.classroomsList.filter(classroom => {
       return !this.classroomsAdded.some(classroomAdded => classroomAdded.name === classroom.name);
     });
@@ -32,12 +31,11 @@ export class CourseClassroomEditComponent implements OnInit {
       return;
     }
 
-    this.classroomsAvailable = this.classroomsAvailable.filter(classroomAvailable => {
-      if (this.selectedClassroom) {
-        classroomAvailable.name !== this.selectedClassroom.name
-      }
-    });
     this.classroomsAdded.push(this.selectedClassroom);
+    this.classroomsAvailable = this.userService.classroomsList.filter(classroom => {
+      return !this.classroomsAdded.some(classroomAdded => classroomAdded.name === classroom.name);
+    });
+    
     this.selectedClassroom = null;
   }
 

@@ -32,6 +32,7 @@ export class HomeComponent implements OnInit {
   async getCourses(){
     let email:String = await this.authService.getEmail();
 
+    this.classroomsList = await this.userService.getClassroomsFromAccount(email);
     this.coursesList = await this.userService.getCoursesFromAccount(email);
   }
 

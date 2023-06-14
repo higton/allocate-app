@@ -33,6 +33,7 @@ export class CoursesComponent implements OnInit {
     }
 
     this.newCourse = {
+      id: 0,
       name: '',
       professor: '',
       groupPeriod: '',

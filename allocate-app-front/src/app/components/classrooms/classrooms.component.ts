@@ -12,6 +12,7 @@ import { Classroom } from 'src/app/models/Classroom';
 })
 export class ClassroomsComponent implements OnInit {
   newClassroom: Classroom = {
+    id: 0,
     name: '',
     numberOfSeats: 0,
     timeSlots: [],
@@ -38,6 +39,7 @@ export class ClassroomsComponent implements OnInit {
       await this.userService.addClassroomToAccount(this.newClassroom, account_email.toString());
 
       this.newClassroom = {
+        id: 0,
         name: '',
         numberOfSeats: 0,
         timeSlots: [],

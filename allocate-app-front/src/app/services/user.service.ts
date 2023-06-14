@@ -78,6 +78,7 @@ export class UserService {
     const query = `
       query getCoursesFromAccount($email: String!){
         getCoursesFromAccount(email: $email) {
+          id,
           name,
           professor,
           group_period,
@@ -112,6 +113,7 @@ export class UserService {
               const classroomObj = this.classroomsList.find((classroomObj) => classroomObj.name === classroomName);
 
               return {
+                id: classroomObj ? classroomObj.id : 0,
                 name: classroomName,
                 numberOfSeats: classroomObj ? classroomObj.numberOfSeats : 0,
                 timeSlots: classroomObj ? classroomObj.timeSlots : [],
@@ -119,6 +121,7 @@ export class UserService {
             });
 
             const newCourse:Course = {
+              id: course.id,
               name: course.name,
               professor: course.professor,
               groupPeriod: course.group_period,
@@ -128,6 +131,7 @@ export class UserService {
               classrooms: newClassrooms,
               semesterPeriod: course.semester_period,
             };
+            console.log("newCourse: ", newCourse);
             this.coursesList.push(newCourse);
           });
           
@@ -249,6 +253,7 @@ export class UserService {
         })
       ).subscribe((response: any) => {
         this.classroomsList.push({
+          id: newClassroom.id,
           name: newClassroom.name,
           numberOfSeats: newClassroom.numberOfSeats,
           timeSlots: newClassroom.timeSlots,
@@ -335,6 +340,7 @@ export class UserService {
     const query = `
       query getClassroomsFromAccount($email: String!) {
         getClassroomsFromAccount(email: $email) {
+          id
           name
           number_of_seats
           time_slot
@@ -353,6 +359,7 @@ export class UserService {
         
         this.classroomsList = classrooms.map((classroom:any) => {
           return {
+            id: classroom.id,
             name: classroom.name,
             numberOfSeats: classroom.number_of_seats,
             timeSlots: classroom.time_slot.split(','),

@@ -34,8 +34,8 @@ export class AllocateComponent implements OnInit {
     const standardClassrooms = this.userService.classroomsList;
 
     for (let classroom of this.userService.classroomsList) {
-      
       classrooms.push({
+        id: classroom.id,
         name: classroom.name,
         numberOfSeats: classroom.numberOfSeats,
         timeSlots: TimeslotHelper.invertTimeSlots(classroom.timeSlots, standardTimeslots),
@@ -46,20 +46,19 @@ export class AllocateComponent implements OnInit {
       let {total_aulas, agrupamento} = SigaaHelper.parseGroupPeriod(course.groupPeriod);
 
       courses.push({
+        id: course.id,
         name: course.name,
         professor: course.professor,
         groupPeriod: course.groupPeriod,
         department: course.department,
         localthreshold: 10,
-        timeSlots: TimeslotHelper.invertTimeSlots(course.timeSlots, standardTimeslots),
+        timeSlots: course.timeSlots,
         grouping: agrupamento,
         totalClasses: total_aulas,
         classrooms: course.classrooms,
         semesterPeriod: course.semesterPeriod,
       });
     }
-
-    console.log(classrooms);
     
     const url = `http://localhost:3000`;
 

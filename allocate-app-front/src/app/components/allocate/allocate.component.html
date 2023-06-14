@@ -1,8 +1,5 @@
 <div class="algorithms-section modern">
-    <div *ngIf="htmlResponse === ''">
-        <h2>Escolha o algoritmo de alocação</h2>
-        <button (click)="openEnsaleitor()">Ensaleitor</button>
-    </div>
-
-    <div [innerHTML]="htmlResponse"></div>
+    <div>
+        <button *ngFor="let topic of topics" (click)="sendMessage(topic)">{{ topic }}</button>
+      </div>
 </div>

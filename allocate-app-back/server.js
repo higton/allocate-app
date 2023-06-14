@@ -19,6 +19,7 @@ let UserSchema = buildSchema(`
     password: String,
   }
   type Course {
+    id: Int,
     name: String,
     professor: String,
     group_period: String,
@@ -29,6 +30,7 @@ let UserSchema = buildSchema(`
     semester_period: String,
   }
   type Classroom {
+    id: Int,
     name: String,
     number_of_seats: Int,
     time_slot: String,
@@ -122,11 +124,11 @@ async function checkToken( request ) {
 
 const Pool = require('pg').Pool
 const pool = new Pool({
-  user: 'me',
-  host: 'localhost',
-  database: 'api',
-  password: 'password',
-  port: 5432,
+  user: process.env.DB_USER,
+  host: process.env.DB_HOST,
+  database: process.env.DB_DATABASE,
+  password: process.env.DB_PASSWORD,
+  port: process.env.DB_PORT,
 })
 
 const rootResolver = {
