@@ -1,17 +1,44 @@
 .modern {
-    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-    color: #333;
-  }
-  
-  .modern h2 {
-    font-weight: 600;
-    font-size: 32px;
-    margin-bottom: 20px;
-  }
-  
-  .algorithms-section {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    padding: 20px;
-  }
+  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+  color: #333;
+}
+
+.modern h2 {
+  font-weight: 600;
+  font-size: 32px;
+  margin-bottom: 20px;
+}
+
+.algorithms-section {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 20px;
+}
+
+.course-button {
+  margin-top: 20px;
+  font-size: 16px;
+  color: #fff;
+  background-color: #007bff;
+  border: none;
+  border-radius: 3px;
+  padding: 10px 20px;
+  cursor: pointer;
+  transition: background-color 0.2s ease;
+  width: 300px;
+  margin-left: 20px;
+}
+
+.button-row {
+  display: flex;
+  flex-direction: row;
+  justify-content: center;
+}
+
+.form-row {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  margin-bottom: 10px;
+}

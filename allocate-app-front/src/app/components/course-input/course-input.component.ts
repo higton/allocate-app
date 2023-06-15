@@ -36,7 +36,9 @@ export class CourseInputComponent implements OnInit {
   }
 
   updateTimeSlots(timeSlots: string[]) {
-    this.course.timeSlots = timeSlots;
+    const sortedTimeSlots = this.sortTimeSlots(timeSlots);
+
+    this.course.timeSlots = sortedTimeSlots;
     
     this.toggleTimetable();
   }
@@ -75,5 +77,22 @@ export class CourseInputComponent implements OnInit {
 
   goBack() {
     this.cancelEvent.emit();
+  }
+
+  sortTimeSlots(timeSlots: string[]): string[] {
+    timeSlots.sort((a, b) => {
+      const aTime = parseInt(a.slice(0, -2));
+      const bTime = parseInt(b.slice(0, -2));
+    
+      if (aTime === bTime) {
+        const aSlot = parseInt(a.slice(-1));
+        const bSlot = parseInt(b.slice(-1));
+        return aSlot - bSlot;
+      }
+    
+      return aTime - bTime;
+    });
+
+    return timeSlots;
   }
 }

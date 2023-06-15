@@ -1,5 +1,4 @@
 <div class="algorithms-section modern">
-    <div>
-        <button *ngFor="let topic of topics" (click)="sendMessage(topic)">{{ topic }}</button>
-      </div>
+  <h2> Soluções disponíveis </h2>
+  <button type="button"  class="course-button" *ngFor="let solution of solutions" (click)="calculate(solution)">{{ solution }}</button>
 </div>

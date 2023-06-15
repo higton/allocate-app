@@ -1,12 +1,14 @@
 const cookieParser = require('cookie-parser');
 const express = require('express');
-const graphqlHTTP = require('express-graphql');
+const { graphqlHTTP } = require('express-graphql');
 const jwt = require('jsonwebtoken');
 const bodyParser = require('body-parser');
-const path = require('path');;
 const { buildSchema } = require('graphql');
+const xmlparser = require('express-xml-bodyparser');
+
 const db = require('./queries');
 const withAuth = require('./middleware');
+const { getExchanges, calculateSolver, connectRabbitMQ } = require('./allocate');
 
 require('dotenv').config()
 const secret = process.env.SECRET;
@@ -100,18 +102,18 @@ let UserSchema = buildSchema(`
   }
 `);
 
-async function checkToken( request ) {
+async function checkToken(request) {
   return await new Promise((resolve, reject) => {
     let token = '';
 
-    if(request.headers.authorization){
+    if (request.headers.authorization) {
       token = request.headers.authorization.split(' ')[1];
     }
 
-    if(!token){
+    if (!token) {
       reject("Unauthorized: No token provided");
     } else {
-      jwt.verify(token, secret, function(err, decoded) {
+      jwt.verify(token, secret, function (err, decoded) {
         if (err) {
           reject("Unauthorized: Invalid token")
         } else {
@@ -133,13 +135,13 @@ const pool = new Pool({
 
 const rootResolver = {
   getUsers: async () => {
-    const users =  await db.getUsers()
+    const users = await db.getUsers()
     return users
   },
 
   checkEmail: async ({ email }, req) => {
     const user = await db.getUser(email)
-    if(user){
+    if (user) {
       return true;
     } else {
       return false;
@@ -162,7 +164,7 @@ const rootResolver = {
       .catch((err) => {
         return new Error("It is necessary to login")
       });
-    
+
     let user = {
       email: userData.email,
     }
@@ -176,19 +178,19 @@ const rootResolver = {
     })
   },
 
-  isCorrectPassword: async ({password}, req) => {
+  isCorrectPassword: async ({ password }, req) => {
     let userData = '';
 
-     await checkToken(req)
-    .then((result) => {
-      userData = result;
-    })
-    .catch((err) => {
-      return new Error("It is necessary to login")
-    });
+    await checkToken(req)
+      .then((result) => {
+        userData = result;
+      })
+      .catch((err) => {
+        return new Error("It is necessary to login")
+      });
 
-    if(userData && password){
-      return await db.isCorrectPassword(userData.email, password).then( (same, err) => {
+    if (userData && password) {
+      return await db.isCorrectPassword(userData.email, password).then((same, err) => {
         if (err) {
           return new Error('Internal error please try again');
         } else if (!same) {
@@ -200,31 +202,31 @@ const rootResolver = {
     }
   },
 
-  changePassword: async ({email, newPassword}, req) => {
+  changePassword: async ({ email, newPassword }, req) => {
     return await db.changePassword(email, newPassword);
   },
 
   checkToken: (args, req) => {
-    if(checkToken(req) === true){
+    if (checkToken(req) === true) {
       return true
-    } else{
+    } else {
       return new Error("It is necessary to login")
     }
   },
 
-  getCoursesFromAccount: async ({email}, req) => {
+  getCoursesFromAccount: async ({ email }, req) => {
     return await db.getCoursesFromAccount(email);
   },
 
   addCourseToAccount: async (
-    { 
-      name, 
-      professor, 
-      group_period, 
-      department, 
-      localthreshold, 
-      time_slot, 
-      classrooms, 
+    {
+      name,
+      professor,
+      group_period,
+      department,
+      localthreshold,
+      time_slot,
+      classrooms,
       account_email,
       semester_period
     }, req) => {
@@ -247,20 +249,20 @@ const rootResolver = {
       .catch((err) => {
         return new Error("It is necessary to login")
       });
-    
-     
+
+
     return await db.removeCourseFromAccount(account_email, course_name);
   },
 
   editCourseFromAccount: async (
-    { 
-      account_email, 
-      course_name, 
-      new_course_name, 
-      new_professor, 
+    {
+      account_email,
+      course_name,
+      new_course_name,
+      new_professor,
       new_group_period,
-      new_department, 
-      new_localthreshold, 
+      new_department,
+      new_localthreshold,
       new_time_slot,
       new_classrooms,
       new_semester_period
@@ -272,19 +274,19 @@ const rootResolver = {
       .catch((err) => {
         return new Error("It is necessary to login")
       });
-    
+
     return await db.editCourseFromAccount(
       account_email,
       course_name,
-      new_course_name, 
-      new_professor, 
-      new_group_period, 
-      new_department, 
-      new_localthreshold, 
-      new_time_slot, 
+      new_course_name,
+      new_professor,
+      new_group_period,
+      new_department,
+      new_localthreshold,
+      new_time_slot,
       new_classrooms,
       new_semester_period
-      );
+    );
   },
 
   addClassroomToAccount: async ({ classroom_name, classroom_number_of_seats, time_slot, account_email }, req) => {
@@ -319,11 +321,11 @@ const rootResolver = {
       .catch((err) => {
         return new Error("It is necessary to login")
       });
-    
+
     return await db.editClassroomFromAccount(account_email, classroom_name, classroom_number_of_seats, classroom_time_slot);
   },
 
-  getClassroomsFromAccount: async ({email}, req) => {
+  getClassroomsFromAccount: async ({ email }, req) => {
     return await db.getClassroomsFromAccount(email);
   }
 }
@@ -336,7 +338,7 @@ let app = express();
 var cors = require('cors');
 
 // use it before all route definitions
-app.use(cors({origin: true, credentials: true}));
+app.use(cors({ origin: true, credentials: true }));
 
 app.options('*', cors());
 
@@ -364,14 +366,14 @@ app.use(bodyParser.urlencoded({ extended: false }));
 app.use(bodyParser.json());
 app.use(cookieParser());
 app.use(loggingMiddleware);
-
+app.use(xmlparser());
 app.use('/graphql', graphqlHTTP({
   schema: UserSchema,
   rootValue: rootResolver,
   graphiql: true,
 }));
 
-app.post('/api/authenticate', async function(req, res) {
+app.post('/api/authenticate', async function (req, res) {
   const { email, password } = req.body;
 
   db.getUser(email)
@@ -384,7 +386,7 @@ app.post('/api/authenticate', async function(req, res) {
         res.status(401)
           .json({ error: 'Incorrect email or password' });
       } else {
-        db.isCorrectPassword(email, password).then( (same, err) => {
+        db.isCorrectPassword(email, password).then((same, err) => {
           if (err) {
             res.status(500)
               .json({ error: 'Internal error please try again' });
@@ -397,18 +399,24 @@ app.post('/api/authenticate', async function(req, res) {
             const token = jwt.sign(payload, secret, {
               expiresIn: '1d',
             });
-          
+
             res.status(200).send({ auth: true, token: token });
           }
         });
       }
-  });
+    });
 });
 
 // This endpoint uses the middleware
 // to check the token from the cookies
 // and verify if the user is logged in
-app.get('/checkToken', withAuth, function(req, res) {
-  res.json({"oki": "doki"});
-})
+app.get('/checkToken', withAuth, function (req, res) {
+  res.json({ "oki": "doki" });
+});
+
+app.get('/exchanges', getExchanges);
+app.post('/calculate/:solver', calculateSolver);
+
+connectRabbitMQ();
+
 app.listen(process.env.PORT || 4000);

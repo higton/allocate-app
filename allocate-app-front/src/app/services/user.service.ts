@@ -9,13 +9,13 @@ import { Classroom } from 'src/app/models/Classroom';
   providedIn: 'root'
 })
 export class UserService {
-	private subjectProfilePicture = new Subject<any>();
+  private subjectProfilePicture = new Subject<any>();
   public classroomsList = new Array<Classroom>();
   public coursesList = new Array<Course>();
 
   constructor(private server: ServerService) { }
 
-  addCourseToAccount(newCourse: Course, account_email: String){
+  addCourseToAccount(newCourse: Course, account_email: String) {
     // if a course with the same name already exists, do nothing
     if (this.coursesList.find((course) => course.name === newCourse.name)) {
       return;
@@ -47,7 +47,7 @@ export class UserService {
             semester_period: $semester_period
           )
         }`;
-    
+
     return new Promise<void>((resolve, reject) => {
       this.server.request('POST', '/graphql',
         JSON.stringify({
@@ -74,7 +74,7 @@ export class UserService {
     });
   }
 
-  getCoursesFromAccount(email: String): Promise<Course[]>{
+  getCoursesFromAccount(email: String): Promise<Course[]> {
     const query = `
       query getCoursesFromAccount($email: String!){
         getCoursesFromAccount(email: $email) {
@@ -100,8 +100,8 @@ export class UserService {
       ).subscribe(
         (response: any) => {
           this.coursesList = [];
-          
-          response.data.getCoursesFromAccount.forEach((course:any) => {
+
+          response.data.getCoursesFromAccount.forEach((course: any) => {
             const timeSlots = course.time_slot.split(',');
             let classrooms = [];
 
@@ -109,7 +109,7 @@ export class UserService {
               classrooms = course.classrooms.split(',');
             }
 
-            const newClassrooms:Classroom[] = classrooms.map((classroomName:any) => { 
+            const newClassrooms: Classroom[] = classrooms.map((classroomName: any) => {
               const classroomObj = this.classroomsList.find((classroomObj) => classroomObj.name === classroomName);
 
               return {
@@ -120,7 +120,7 @@ export class UserService {
               };
             });
 
-            const newCourse:Course = {
+            const newCourse: Course = {
               id: course.id,
               name: course.name,
               professor: course.professor,
@@ -134,7 +134,7 @@ export class UserService {
             console.log("newCourse: ", newCourse);
             this.coursesList.push(newCourse);
           });
-          
+
           resolve(this.coursesList);
         },
         (err) => {
@@ -143,7 +143,7 @@ export class UserService {
     });
   }
 
-  removeCourseFromAccount(course_name: String, account_email: String){
+  removeCourseFromAccount(course_name: String, account_email: String) {
     const query = `
       mutation removeCourseFromAccount($course_name: String!, $account_email: String!) {
         removeCourseFromAccount(course_name: $course_name, account_email: $account_email)
@@ -160,9 +160,9 @@ export class UserService {
         this.coursesList = this.coursesList.filter((course) => course.name !== course_name);
         resolve();
       },
-      (err) => {
-        reject(err);
-      })
+        (err) => {
+          reject(err);
+        })
     });
   }
 
@@ -216,19 +216,19 @@ export class UserService {
         })
       ).subscribe((response: any) => {
         // update course in coursesList
-        this.coursesList = this.coursesList.map((course) => {
-          return newCourse;
-        });
+        const courseIndex = this.coursesList.findIndex((course) => course.name === newCourse.name);
+
+        this.coursesList[courseIndex] = newCourse;
 
         resolve();
       },
-      (err) => {
-        reject(err);
-      })
+        (err) => {
+          reject(err);
+        })
     });
   }
 
-  addClassroomToAccount(newClassroom: Classroom, account_email: String){
+  addClassroomToAccount(newClassroom: Classroom, account_email: String) {
     // if a classroom with the same name already exists, do not add it again
     if (this.classroomsList.find((classroom) => classroom.name === newClassroom.name)) {
       return;
@@ -244,11 +244,11 @@ export class UserService {
       this.server.request('POST', '/graphql',
         JSON.stringify({
           query,
-          variables: { 
-            classroom_name: newClassroom.name, 
-            classroom_number_of_seats: newClassroom.numberOfSeats, 
-            time_slot: newClassroom.timeSlots.join(','), 
-            account_email 
+          variables: {
+            classroom_name: newClassroom.name,
+            classroom_number_of_seats: newClassroom.numberOfSeats,
+            time_slot: newClassroom.timeSlots.join(','),
+            account_email
           },
         })
       ).subscribe((response: any) => {
@@ -261,13 +261,13 @@ export class UserService {
 
         resolve();
       },
-      (err) => {
-        reject(err);
-      })
+        (err) => {
+          reject(err);
+        })
     });
   }
 
-  removeClassroomFromAccount(classroom_name: String, account_email: String){
+  removeClassroomFromAccount(classroom_name: String, account_email: String) {
     const query = `
       mutation removeClassroomFromAccount($classroom_name: String!, $account_email: String!) {
         removeClassroomFromAccount(classroom_name: $classroom_name, account_email: $account_email)
@@ -285,13 +285,13 @@ export class UserService {
 
         resolve();
       },
-      (err) => {
-        reject(err);
-      })
+        (err) => {
+          reject(err);
+        })
     });
   }
 
-  editClassroomFromAccount(classroom: Classroom, editedClassroom: Classroom, account_email: String){
+  editClassroomFromAccount(classroom: Classroom, editedClassroom: Classroom, account_email: String) {
     const query = `
       mutation editClassroomFromAccount(
         $classroom_name: String!, 
@@ -311,11 +311,11 @@ export class UserService {
       this.server.request('POST', '/graphql',
         JSON.stringify({
           query,
-          variables: { 
-            classroom_name: classroom.name, 
-            classroom_number_of_seats: editedClassroom.numberOfSeats, 
+          variables: {
+            classroom_name: classroom.name,
+            classroom_number_of_seats: editedClassroom.numberOfSeats,
             classroom_time_slot: editedClassroom.timeSlots.join(','),
-            account_email 
+            account_email
           },
         })
       ).subscribe((response: any) => {
@@ -327,16 +327,16 @@ export class UserService {
             break;
           }
         }
-        
+
         resolve();
       },
-      (err) => {
-        reject(err);
-      })
+        (err) => {
+          reject(err);
+        })
     });
   }
 
-  getClassroomsFromAccount(email: String): Promise<Classroom[]>{
+  getClassroomsFromAccount(email: String): Promise<Classroom[]> {
     const query = `
       query getClassroomsFromAccount($email: String!) {
         getClassroomsFromAccount(email: $email) {
@@ -356,8 +356,8 @@ export class UserService {
         })
       ).subscribe((response: any) => {
         let classrooms = response.data.getClassroomsFromAccount;
-        
-        this.classroomsList = classrooms.map((classroom:any) => {
+
+        this.classroomsList = classrooms.map((classroom: any) => {
           return {
             id: classroom.id,
             name: classroom.name,
@@ -368,9 +368,67 @@ export class UserService {
 
         resolve(response.data.getClassroomsFromAccount);
       },
-      (err) => {
-        reject(err);
-      })
+        (err) => {
+          reject(err);
+        })
+    });
+  }
+
+  // create function to get all existent solutions
+  // the endpoint is "/exchanges" and the method is GET
+  // the response example:
+  //   {
+  //     "solvers": [
+  //         "solver1",
+  //         "solver2"
+  //     ]
+  // }
+  // the function should return an array of strings with the solvers names
+  getSolutions(): Promise<string[]> {
+    return new Promise((resolve, reject) => {
+      this.server.request('GET', '/exchanges').subscribe({
+        next: (response: undefined | any) => {
+          if (response) {
+            resolve(response.solvers);
+          } else {
+            resolve([]);
+          }
+        },
+        error: (err) => {
+          reject(err);
+        }
+      });
+    });
+  }
+
+  // create function to calculate the solution using a specific solver
+  // the endpoint is "/calculate/{solver}" and the method is POST
+  // the body is a xml
+  // the response example:
+  // {
+  //   "message": "Calculating"
+  // }
+  // 
+  // another example:
+  // {
+  //   "message": "<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n\n<solution name=\"instance-name3\" runtime=\"0\" cores=\"1\" technique=\"UniTime/Local Search\" author=\"UniTime Solver\" institution=\"UniTime\" country=\"Czechia\">\n  <class id=\"1\" days=\"0010000\" start=\"192\" weeks=\"1111111111111\" room=\"3\">\n    <!--W 16:00 - 18:00 1111111111111 R3 -->\n  </class>\n  <class id=\"10001\" days=\"0000100\" start=\"168\" weeks=\"1111111111111\" room=\"2\">\n    <!--F 14:00 - 18:00 1111111111111 R2 -->\n  </class>\n</solution>\n"
+  // }
+
+  // the function should return the solution as a string
+  calculateSolution(solver: string, xml: string): Promise<string> {
+    return new Promise((resolve, reject) => {
+      this.server.xmlRequest('POST', `/calculate/${solver}`, xml).subscribe({
+        next: (response: undefined | any) => {
+          if (response) {
+            resolve(response.message);
+          } else {
+            resolve('');
+          }
+        },
+        error: (err) => {
+          reject(err);
+        }
+      });
     });
   }
 }

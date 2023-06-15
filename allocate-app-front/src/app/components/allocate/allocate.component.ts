@@ -5,9 +5,9 @@ import { DomSanitizer, SafeHtml } from '@angular/platform-browser';
 import { UserService } from 'src/app/services/user.service';
 import { AuthService } from '../../auth/services/auth.service';
 import { TimeslotHelper } from 'src/util/timeslot-helper';
-import { SigaaHelper } from 'src/util/sigaa-helper';
 import { Classroom } from 'src/app/models/Classroom';
 import { Course } from 'src/app/models/Course';
+import { generateXMLInputData } from 'src/util/transform-xml';
 
 @Component({
   selector: 'app-allocate',
@@ -16,6 +16,7 @@ import { Course } from 'src/app/models/Course';
 })
 export class AllocateComponent implements OnInit {
   htmlResponse: SafeHtml = '';
+  solutions: string[] = ['ensaleitor'];
 
   constructor(
     public userService: UserService,
@@ -24,14 +25,39 @@ export class AllocateComponent implements OnInit {
     private sanitizer: DomSanitizer
   ) { }
 
-  ngOnInit(): void {}
+  ngOnInit(): void { 
+    this.updateSolutions();
+  }
 
+  async updateSolutions() {
+    let result_solutions = await this.userService.getSolutions();
+
+    // add new solutions to the list
+    for (let solution of result_solutions) {
+      if (!this.solutions.includes(solution)) {
+        this.solutions.push(solution);
+      }
+    }
+  }
+
+  calculate(solver: string) {
+    if (solver === 'enseleitor') {
+      this.openEnsaleitor();
+    }
+
+    let xmlContent = generateXMLInputData(this.userService.coursesList, this.userService.classroomsList)
+    
+    console.log("XML content:", xmlContent);
+    let response = this.userService.calculateSolution(solver, xmlContent);
+    console.log("Response:", response);
+  }
+
+  // TODO: remove this code and use the new plugin interface
   openEnsaleitor() {
-    let classrooms:Classroom[] = [];
-    let courses:any[] = [];
+    let classrooms: Classroom[] = [];
+    let courses: any[] = [];
 
     const standardTimeslots = TimeslotHelper.getStandardTimeSlots();
-    const standardClassrooms = this.userService.classroomsList;
 
     for (let classroom of this.userService.classroomsList) {
       classrooms.push({
@@ -43,8 +69,6 @@ export class AllocateComponent implements OnInit {
     }
 
     for (let course of this.userService.coursesList) {
-      let {total_aulas, agrupamento} = SigaaHelper.parseGroupPeriod(course.groupPeriod);
-
       courses.push({
         id: course.id,
         name: course.name,
@@ -53,13 +77,13 @@ export class AllocateComponent implements OnInit {
         department: course.department,
         localthreshold: 10,
         timeSlots: course.timeSlots,
-        grouping: agrupamento,
-        totalClasses: total_aulas,
+        grouping: course.groupPeriod,
+        totalClasses: course.groupPeriod.split(',').map(Number).reduce((a, b) => a + b, 0), // totalClasses = the sum of all numbers in course.groupPeriod
         classrooms: course.classrooms,
         semesterPeriod: course.semesterPeriod,
       });
     }
-    
+
     const url = `http://localhost:3000`;
 
     const body = { classrooms: classrooms, courses: courses, output: "output" };

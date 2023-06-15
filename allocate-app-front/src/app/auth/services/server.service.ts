@@ -61,4 +61,17 @@ export class ServerService {
       params
     });
   }
+
+  xmlRequest(method: string, route: string, data?: any) {
+    console.log("XML request:", data);
+    return this.http.request(method, baseUrl + route, {
+      body: data,
+      responseType: 'json',
+      observe: 'body',
+      headers: {
+        'Content-Type': 'text/xml',
+        'Accept': 'text/xml'
+      }
+    });
+  }
 }
