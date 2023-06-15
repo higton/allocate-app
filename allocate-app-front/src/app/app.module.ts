@@ -18,6 +18,8 @@ import { TimetableComponent } from './components/timetable/timetable.component';
 import { CourseClassroomEditComponent } from './components/course-classroom-edit/course-classroom-edit.component';
 import { CourseInputComponent } from './components/course-input/course-input.component';
 import { AllocateComponent } from './components/allocate/allocate.component';
+import { SolutionTimetableComponent } from './components/solution-timetable/solution-timetable.component';
+import { SolutionComponent } from './components/solution/solution.component';
 
 @NgModule({
   declarations: [
@@ -31,6 +33,8 @@ import { AllocateComponent } from './components/allocate/allocate.component';
     CourseClassroomEditComponent,
     CourseInputComponent,
     AllocateComponent,
+    SolutionTimetableComponent,
+    SolutionComponent,
   ],
   imports: [
     BrowserAnimationsModule,

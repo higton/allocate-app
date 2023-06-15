@@ -29,7 +29,6 @@ export class ClassroomsComponent implements OnInit {
   ) { }
 
   ngOnInit(): void {
-    this.newClassroom
   }
 
   async addClassroomToAccount() {

@@ -1,0 +1,25 @@
+<div *ngFor="let roomItem of roomsList" class="timetable-section modern">
+  <h2>Sala: {{getRoomFromId(roomItem.room)?.name}}</h2>
+  <table>
+    <thead>
+      <tr>
+        <th>Time</th>
+        <th *ngFor="let day of days">{{ day }}</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr *ngFor="let timeSlot of timeSlots">
+        <td>{{ timeSlot.time }}</td>
+        <td *ngFor="let day of days">
+          <ng-container *ngFor="let classItem of roomItem.classes">
+            <div *ngIf="getCourse(day, timeSlot, classItem)">
+              {{ getCourse(day, timeSlot, classItem)?.course.name }} <br>
+              {{ getCourse(day, timeSlot, classItem)?.course.professor }} <br>
+              {{ getCourse(day, timeSlot, classItem)?.room.name }}
+            </div>
+          </ng-container>
+        </td>
+      </tr>
+    </tbody>
+  </table>
+</div>

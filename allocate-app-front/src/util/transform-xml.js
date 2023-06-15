@@ -72,9 +72,9 @@ function generateXMLClassrooms(root, classrooms) {
             if (expectedPreviousTimeSlot === previousTimeSlot) {
                 sequenceSize++;
             } else if (expectedPreviousTimeSlot !== undefined) {
-                console.log("else different time slot");
-                console.log("expectedPreviousTimeSlot", expectedPreviousTimeSlot);
-                console.log("previousTimeSlot", previousTimeSlot);
+                // console.log("else different time slot");
+                // console.log("expectedPreviousTimeSlot", expectedPreviousTimeSlot);
+                // console.log("previousTimeSlot", previousTimeSlot);
 
                 const [previousDay, ,] = getTimeSlotDetails(expectedPreviousTimeSlot);
 
@@ -257,9 +257,22 @@ function formatTime(hour, minutes) {
     return `${hour.toString().padStart(2, '0')}:${minutes.toString().padStart(2, '0')}`;
 }
 
+function generateXMLDistributions(root, courses) {
+    let xmlCourses = root.ele('distributions');
+
+    for (const course of courses) {
+        const courseElem = xmlCourses.ele('distribution', { type: "NotOverlap", required: "true" });
+
+        const grouping = course.groupPeriod.split(' ');
+        for (let i = 0; i < grouping.length; i++) {
+            courseElem.ele('class', { id: course.id+(10000*i) });
+        }
+    }
+}
+
 export function generateXMLInputData(courses, classrooms) {
-    console.log('Generating XML input data...');
-    console.log('Courses: ', courses);
+    // console.log('Generating XML input data...');
+    // console.log('Courses: ', courses);
 
     const xmlBuilder = create({ version: '1.0', encoding: 'UTF-8' });
     const rootElement = xmlBuilder
@@ -273,7 +286,7 @@ export function generateXMLInputData(courses, classrooms) {
     generateXMLClassrooms(rootElement, classrooms);
 
     generateXMLCourses(rootElement, courses);
-    rootElement.ele('distributions');
+    generateXMLDistributions(rootElement, courses);
     rootElement.ele('students');
 
     const xmlString = rootElement.end({ pretty: true });

@@ -374,16 +374,6 @@ export class UserService {
     });
   }
 
-  // create function to get all existent solutions
-  // the endpoint is "/exchanges" and the method is GET
-  // the response example:
-  //   {
-  //     "solvers": [
-  //         "solver1",
-  //         "solver2"
-  //     ]
-  // }
-  // the function should return an array of strings with the solvers names
   getSolutions(): Promise<string[]> {
     return new Promise((resolve, reject) => {
       this.server.request('GET', '/exchanges').subscribe({
@@ -401,20 +391,6 @@ export class UserService {
     });
   }
 
-  // create function to calculate the solution using a specific solver
-  // the endpoint is "/calculate/{solver}" and the method is POST
-  // the body is a xml
-  // the response example:
-  // {
-  //   "message": "Calculating"
-  // }
-  // 
-  // another example:
-  // {
-  //   "message": "<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n\n<solution name=\"instance-name3\" runtime=\"0\" cores=\"1\" technique=\"UniTime/Local Search\" author=\"UniTime Solver\" institution=\"UniTime\" country=\"Czechia\">\n  <class id=\"1\" days=\"0010000\" start=\"192\" weeks=\"1111111111111\" room=\"3\">\n    <!--W 16:00 - 18:00 1111111111111 R3 -->\n  </class>\n  <class id=\"10001\" days=\"0000100\" start=\"168\" weeks=\"1111111111111\" room=\"2\">\n    <!--F 14:00 - 18:00 1111111111111 R2 -->\n  </class>\n</solution>\n"
-  // }
-
-  // the function should return the solution as a string
   calculateSolution(solver: string, xml: string): Promise<string> {
     return new Promise((resolve, reject) => {
       this.server.xmlRequest('POST', `/calculate/${solver}`, xml).subscribe({
