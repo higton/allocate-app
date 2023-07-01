@@ -29,7 +29,6 @@ const timeHourData = {
 
 
 function generateXMLClassrooms(root, classrooms) {
-    console.log("generateXMLClassrooms", classrooms);
     const xmlClassrooms = root.ele('rooms');
 
     for (const classroom of classrooms) {
@@ -39,11 +38,6 @@ function generateXMLClassrooms(root, classrooms) {
         let sequenceStartTime = -1;
         let expectedPreviousTimeSlot = undefined;
 
-        console.log("classroom.timeSlots", classroom.timeSlots);
-        console.log("classroom: ", classroom);
-
-        // go through all the time slots of the classroom
-        // if the time slot is an empty string filter
         let filteredTimeSlots = classroom.timeSlots.filter(timeSlot => timeSlot !== '');
 
         for (const timeSlot of filteredTimeSlots) {
@@ -58,7 +52,6 @@ function generateXMLClassrooms(root, classrooms) {
 
             // if last 2 caracters equal "m1", it is the first time slot of the day
             if (timeSlot.endsWith('m1')) {
-                console.log("timeSlot2", timeSlot);
                 const [previousDay, ,] = getTimeSlotDetails(expectedPreviousTimeSlot);
 
                 // add a new xml element with the currect length
@@ -87,7 +80,6 @@ function generateXMLClassrooms(root, classrooms) {
                 // console.log("expectedPreviousTimeSlot", expectedPreviousTimeSlot);
                 // console.log("previousTimeSlot", previousTimeSlot);
                 
-                console.log("timeSlot3", timeSlot);
                 const [previousDay, ,] = getTimeSlotDetails(expectedPreviousTimeSlot);
 
                 // add a new xml element with the currect length
@@ -142,6 +134,8 @@ function generateXMLCourses(root, courses) {
             const limit = course.localthreshold;
             const classElem = subpartElem.ele('class', { id: course.id+(10000*i), limit: limit.toString() });
 
+            console.log("classElem id: ", course.id+(10000*i));
+
             for (const classroom of course.classrooms) {
                 classElem.ele('room', { id: classroom.id, penalty: '10' });
             }
@@ -149,6 +143,7 @@ function generateXMLCourses(root, courses) {
             let sequenceSize = 1;
             let sequenceStartTime = -1;
             let expectedPreviousTimeSlot = '';
+            console.log("timeslots: ", course.timeSlots);
             for (const timeSlot of course.timeSlots) {
                 // use getTimeSlotDetails to get the day and startTime
                 const [day, startTime, timePosition] = getTimeSlotDetails(timeSlot);
@@ -159,7 +154,7 @@ function generateXMLCourses(root, courses) {
                 }
 
                 // if last 2 caracters equal "m1", it is the first time slot of the day
-                if (timeSlot.endsWith('m1')) {
+                if (timeSlot.endsWith('m1') && expectedPreviousTimeSlot !== '') {
                     // reset the sequence size
                     const [previousDay, ,] = getTimeSlotDetails(expectedPreviousTimeSlot);
 
@@ -179,7 +174,6 @@ function generateXMLCourses(root, courses) {
                     sequenceSize = 1;
                     sequenceStartTime = startTime;
                     expectedPreviousTimeSlot = timeSlot;
-                    return;
                 }
 
                 const previousTimeSlot = timeRangeData[day][timePosition - 1];

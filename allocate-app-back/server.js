@@ -81,7 +81,7 @@ let UserSchema = buildSchema(`
       new_time_slot: String!, 
       new_classrooms: String!,
       new_semester_period: String!
-      new_seat_count: Int,
+      new_seat_count: Int!,
     ): String,
     addClassroom(
       classroom_name: String!, 
@@ -282,7 +282,7 @@ const rootResolver = {
       new_time_slot,
       new_classrooms,
       new_semester_period,
-      seat_count
+      new_seat_count
     );
   },
 

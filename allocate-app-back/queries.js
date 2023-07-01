@@ -197,7 +197,7 @@ async function editCourse(
 		localthreshold = ($6),
 		time_slot = ($7),
 		classrooms = ($8),
-		semester_period = ($9)
+		semester_period = ($9),
 		seat_count = ($10)
 		WHERE name = ($1)`,
 		[course_name, new_name, new_professor, new_group_period, new_department, new_localthreshold, new_time_slot, new_classrooms, new_semester_period, new_seat_count]

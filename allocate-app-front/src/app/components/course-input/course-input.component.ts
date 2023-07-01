@@ -83,19 +83,27 @@ export class CourseInputComponent implements OnInit {
   }
 
   sortTimeSlots(timeSlots: string[]): string[] {
-    timeSlots.sort((a, b) => {
-      const aTime = parseInt(a.slice(0, -2));
-      const bTime = parseInt(b.slice(0, -2));
-
-      if (aTime === bTime) {
-        const aSlot = parseInt(a.slice(-1));
-        const bSlot = parseInt(b.slice(-1));
-        return aSlot - bSlot;
+    function compare(a: string, b: string): number {
+      const [, numA, letterA] = a.match(/^(\d+)([a-z]+)/i)!;
+      const [, numB, letterB] = b.match(/^(\d+)([a-z]+)/i)!;
+  
+      if (numA !== numB) {
+        return parseInt(numA) - parseInt(numB);
       }
-    
-      return aTime - bTime;
-    });
-
+  
+      if (letterA === 't' && letterB === 'n') {
+        return -1;
+      }
+  
+      if (letterA === 'n' && letterB === 't') {
+        return 1;
+      }
+  
+      return letterA.localeCompare(letterB);
+    }
+  
+    timeSlots.sort(compare);
+  
     return timeSlots;
   }
 }
