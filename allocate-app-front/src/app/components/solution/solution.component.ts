@@ -30,13 +30,16 @@ export class SolutionComponent implements OnInit {
   ngOnInit(): void {
     this.solution = this.route.snapshot.paramMap.get('id') || '';
 
+    console.log("Solution:", this.solution);
+
     this.calculate(this.solution);
   }
   
   async calculate(solver: string) {
-    let email:String = await this.authService.getEmail();
+    await this.userService.getCourses();
 
-    await this.userService.getCoursesFromAccount(email);
+    console.log("Classrooms:", this.userService.classroomsList);
+    console.log("Courses:", this.userService.coursesList);
 
     if (solver === 'enseleitor') {
       this.openEnsaleitor();
@@ -44,6 +47,7 @@ export class SolutionComponent implements OnInit {
 
     let xmlContent = generateXMLInputData(this.userService.coursesList, this.userService.classroomsList)
 
+    console.log("XML content:", xmlContent);
     const response = await this.userService.calculateSolution(solver, xmlContent);
     console.log("Response:", response);
 

@@ -224,6 +224,7 @@ function generateXMLCourses(root, courses) {
 }
 
 function getTimeSlotDetails(timeSlot) {
+    console.log("getTimeSlotDetails", timeSlot);
     const day = timeSlot.charAt(0) - 2;
     const startTime = timeHourData[timeSlot.substring(1, 3)];
 

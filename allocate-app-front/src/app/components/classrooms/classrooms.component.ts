@@ -31,11 +31,9 @@ export class ClassroomsComponent implements OnInit {
   ngOnInit(): void {
   }
 
-  async addClassroomToAccount() {
-    let account_email:String = await this.authService.getEmail();
-
+  async addClassroom() {
     if (this.newClassroom.name && this.newClassroom.numberOfSeats) {
-      await this.userService.addClassroomToAccount(this.newClassroom, account_email.toString());
+      await this.userService.addClassroom(this.newClassroom);
 
       this.newClassroom = {
         id: 0,
@@ -47,9 +45,7 @@ export class ClassroomsComponent implements OnInit {
   }
 
   async removeItem(classroom: Classroom) {
-    let account_email:String = await this.authService.getEmail();
-
-    await this.userService.removeClassroomFromAccount(classroom.name, account_email);
+    await this.userService.removeClassroom(classroom.name);
   }
 
   startEditing(classroom: Classroom) {
@@ -68,10 +64,8 @@ export class ClassroomsComponent implements OnInit {
 
   async editClassroom(classroom: Classroom) {
     this.selectedClassroom = null;
-    
-    let account_email:String = await this.authService.getEmail();
 
-    this.userService.editClassroomFromAccount(classroom, this.editedClassroom, account_email);
+    this.userService.editClassroom(classroom, this.editedClassroom);
   }
 
   navigateToCourses() {

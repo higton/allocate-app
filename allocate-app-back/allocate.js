@@ -8,7 +8,6 @@ logger.setLevel(logger.levels.INFO);
 let solvers = [];
 let request_made = {};
 
-// RabbitMQ connection parameters
 const RABBITMQ_HOST = 'localhost';
 const RABBITMQ_PORT = 5672;
 const RABBITMQ_PORT_HTTP = 15672;
@@ -17,12 +16,12 @@ const RABBITMQ_PASSWORD = 'password';
 
 let channel, connection;
 
-// create connect rabbitMQ function that returns a channel and a connection
 async function connectRabbitMQ() {
     try {
-        // Establish connection to RabbitMQ server
         connection = await amqp.connect(`amqp://${RABBITMQ_USERNAME}:${RABBITMQ_PASSWORD}@${RABBITMQ_HOST}:${RABBITMQ_PORT}`);
         channel = await connection.createChannel();
+
+        console.log("Connected to RabbitMQ");
     } catch (error) {
         logger.error('Error:', error);
     }

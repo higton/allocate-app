@@ -5,7 +5,6 @@ import { UserService } from '../../services/user.service';
 import { Course } from 'src/app/models/Course';
 import { Classroom } from 'src/app/models/Classroom';
 import { ServerService } from 'src/app/auth/services/server.service';
-import { RouterModule } from '@angular/router';
 
 @Component({
   selector: 'app-home',
@@ -25,21 +24,16 @@ export class HomeComponent implements OnInit {
     ) {}
 
   ngOnInit(): void {
-    this.getCourses();
     this.getClassrooms();
+    this.getCourses();
   }
 
   async getCourses(){
-    let email:String = await this.authService.getEmail();
-
-    this.classroomsList = await this.userService.getClassroomsFromAccount(email);
-    this.coursesList = await this.userService.getCoursesFromAccount(email);
+    this.coursesList = await this.userService.getCourses();
   }
 
   async getClassrooms(){
-    let email:String = await this.authService.getEmail();
-
-    await this.userService.getClassroomsFromAccount(email);
+    await this.userService.getClassrooms();
   }
 
   handleNextCourse(event: any) {

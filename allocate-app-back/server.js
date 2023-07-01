@@ -44,8 +44,8 @@ let UserSchema = buildSchema(`
     getUsers: [User],
     checkToken: Boolean,
     isCorrectPassword(password: String!): Boolean,
-    getCoursesFromAccount(email: String!): [Course],
-    getClassroomsFromAccount(email: String!): [Classroom],
+    getCourses: [Course],
+    getClassrooms: [Classroom],
   }
   type Mutation {
     addUser( 
@@ -56,23 +56,20 @@ let UserSchema = buildSchema(`
       email: String!, 
       newPassword: String!
     ): String,
-    addCourseToAccount(
+    addCourse(
       name: String!, 
       professor: String!, 
       group_period: String!, 
       department: String!, 
       localthreshold: Int!, 
       time_slot: String!, 
-      classrooms: String!, 
-      account_email: String!,
+      classrooms: String!,
       semester_period: String!
     ): String,
-    removeCourseFromAccount(
-      course_name: String!, 
-      account_email: String!
+    removeCourse(
+      course_name: String!,
     ): String,
-    editCourseFromAccount(
-      account_email: String!, 
+    editCourse(
       course_name: String!, 
       new_course_name: String!, 
       new_professor: String!, 
@@ -83,18 +80,15 @@ let UserSchema = buildSchema(`
       new_classrooms: String!,
       new_semester_period: String!
     ): String,
-    addClassroomToAccount(
+    addClassroom(
       classroom_name: String!, 
       classroom_number_of_seats: Int!, 
       time_slot: String!, 
-      account_email: String!
     ): String,
-    removeClassroomFromAccount(
-      classroom_name: String!, 
-      account_email: String!
+    removeClassroom(
+      classroom_name: String!,
     ): String,
-    editClassroomFromAccount(
-      account_email: String!, 
+    editClassroom(
       classroom_name: String!, 
       classroom_number_of_seats: Int!, 
       classroom_time_slot: String!
@@ -214,11 +208,11 @@ const rootResolver = {
     }
   },
 
-  getCoursesFromAccount: async ({ email }, req) => {
-    return await db.getCoursesFromAccount(email);
+  getCourses: async ({ email }, req) => {
+    return await db.getCourses();
   },
 
-  addCourseToAccount: async (
+  addCourse: async (
     {
       name,
       professor,
@@ -227,7 +221,6 @@ const rootResolver = {
       localthreshold,
       time_slot,
       classrooms,
-      account_email,
       semester_period
     }, req) => {
     await checkToken(req)
@@ -238,10 +231,10 @@ const rootResolver = {
         return new Error("It is necessary to login")
       });
 
-    return await db.addCourseToAccount(account_email, name, professor, group_period, department, localthreshold, time_slot, classrooms, semester_period);
+    return await db.addCourse(name, professor, group_period, department, localthreshold, time_slot, classrooms, semester_period);
   },
 
-  removeCourseFromAccount: async ({ account_email, course_name }, req) => {
+  removeCourse: async ({ course_name }, req) => {
     await checkToken(req)
       .then((result) => {
         userData = result;
@@ -251,12 +244,11 @@ const rootResolver = {
       });
 
 
-    return await db.removeCourseFromAccount(account_email, course_name);
+    return await db.removeCourse(course_name);
   },
 
-  editCourseFromAccount: async (
+  editCourse: async (
     {
-      account_email,
       course_name,
       new_course_name,
       new_professor,
@@ -275,8 +267,7 @@ const rootResolver = {
         return new Error("It is necessary to login")
       });
 
-    return await db.editCourseFromAccount(
-      account_email,
+    return await db.editCourse(
       course_name,
       new_course_name,
       new_professor,
@@ -289,7 +280,7 @@ const rootResolver = {
     );
   },
 
-  addClassroomToAccount: async ({ classroom_name, classroom_number_of_seats, time_slot, account_email }, req) => {
+  addClassroom: async ({ classroom_name, classroom_number_of_seats, time_slot }, req) => {
     await checkToken(req)
       .then((result) => {
         userData = result;
@@ -298,10 +289,10 @@ const rootResolver = {
         return new Error("It is necessary to login")
       });
 
-    return await db.addClassroomToAccount(account_email, classroom_name, classroom_number_of_seats, time_slot);
+    return await db.addClassroom(classroom_name, classroom_number_of_seats, time_slot);
   },
 
-  removeClassroomFromAccount: async ({ account_email, classroom_name }, req) => {
+  removeClassroom: async ({ classroom_name }, req) => {
     await checkToken(req)
       .then((result) => {
         userData = result;
@@ -310,10 +301,10 @@ const rootResolver = {
         return new Error("It is necessary to login")
       });
 
-    return await db.removeClassroomFromAccount(account_email, classroom_name);
+    return await db.removeClassroom(classroom_name);
   },
 
-  editClassroomFromAccount: async ({ account_email, classroom_name, classroom_number_of_seats, classroom_time_slot }, req) => {
+  editClassroom: async ({ classroom_name, classroom_number_of_seats, classroom_time_slot }, req) => {
     await checkToken(req)
       .then((result) => {
         userData = result;
@@ -322,11 +313,11 @@ const rootResolver = {
         return new Error("It is necessary to login")
       });
 
-    return await db.editClassroomFromAccount(account_email, classroom_name, classroom_number_of_seats, classroom_time_slot);
+    return await db.editClassroom(classroom_name, classroom_number_of_seats, classroom_time_slot);
   },
 
-  getClassroomsFromAccount: async ({ email }, req) => {
-    return await db.getClassroomsFromAccount(email);
+  getClassrooms: async ({ email }, req) => {
+    return await db.getClassrooms(email);
   }
 }
 

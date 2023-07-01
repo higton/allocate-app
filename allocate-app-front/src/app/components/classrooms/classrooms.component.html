@@ -18,7 +18,7 @@
             <div class="container">
               {{ this.editedClassroom.timeSlots }}
             </div>
-            <button class="timetable-button" type="button" (click)="openTimetable(editedClassroom.timeSlots)">Editar turnos disponíveis</button>
+            <button class="timetable-button" type="button" (click)="openTimetable(editedClassroom.timeSlots)">Editar turnos</button>
           </div>
           <div class="button-row">
             <button type="button" (click)="cancelEditing()" class="classroom-button remove-button">Cancelar</button>
@@ -39,7 +39,7 @@
   <div *ngIf="!selectedClassroom" class="classrooms-section modern">
     <h2>Adicionar nova Sala</h2>
     <div class="form-container">
-      <form (submit)="addClassroomToAccount()">
+      <form (submit)="addClassroom()">
         <div class="form-row">
           <label for="name">Nome:</label>
           <input type="text" [(ngModel)]="newClassroom.name" name="name" placeholder="Name">
@@ -53,7 +53,7 @@
           <div class="container">
             {{ this.newClassroom.timeSlots }}
           </div>
-          <button class="timetable-button" type="button" (click)="openTimetable(newClassroom.timeSlots)">Editar turnos disponíveis</button>
+          <button class="timetable-button" type="button" (click)="openTimetable(newClassroom.timeSlots)">Editar turnos</button>
         </div>
         <div class="button-row">
           <button type="submit" class="classroom-button">Adicionar Sala</button>

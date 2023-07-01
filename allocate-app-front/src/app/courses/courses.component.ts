@@ -43,27 +43,21 @@ export class CoursesComponent implements OnInit {
       classrooms: [],
       semesterPeriod: 1,
     };
-    
+
   }
 
   async getCourses() {
-    let email:String = await this.authService.getEmail();
-
-    await this.userService.getCoursesFromAccount(email);
+    await this.userService.getCourses();
   }
 
   async addCourseToAccount(newCourse: Course) {
-    let account_email = await this.authService.getEmail();
-
     if (newCourse.name && newCourse.professor && newCourse.groupPeriod && newCourse.department && newCourse.semesterPeriod) {
-      await this.userService.addCourseToAccount(newCourse, account_email);
+      await this.userService.addCourse(newCourse);
     }
   }
 
   async removeCourse(course: Course) {
-    let account_email:String = await this.authService.getEmail();
-
-    await this.userService.removeCourseFromAccount(course.name, account_email);
+    await this.userService.removeCourse(course.name);
   }
 
   startEditing(course: Course) {
@@ -75,7 +69,7 @@ export class CoursesComponent implements OnInit {
 
     this.editedCourse = { ...course };
   }
-  
+
   cancelEditing() {
     this.selectedCourse = null;
   }
@@ -83,9 +77,7 @@ export class CoursesComponent implements OnInit {
   async editCourse(course: Course) {
     this.selectedCourse = null;
 
-    let account_email:String = await this.authService.getEmail();
-
-    this.userService.editCourseFromAccount(course, account_email);
+    this.userService.editCourse(course);
   }
 
   navigateToClassrooms() {
