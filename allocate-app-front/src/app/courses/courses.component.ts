@@ -54,6 +54,8 @@ export class CoursesComponent implements OnInit {
     if (newCourse.name && newCourse.professor && newCourse.groupPeriod && newCourse.department && newCourse.semesterPeriod) {
       await this.userService.addCourse(newCourse);
     }
+
+    this.selectedCourse = null
   }
 
   async removeCourse(course: Course) {

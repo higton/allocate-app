@@ -19,15 +19,7 @@ interface Class {
   styleUrls: ['./solution-timetable.component.css']
 })
 export class SolutionTimetableComponent implements OnInit {
-  @Input() xmlData: string = `<?xml version="1.0" encoding="UTF-8"?>
-  <solution name="instance-name" runtime="0" cores="1" technique="UniTime/Local Search" author="UniTime Solver" institution="UniTime" country="Czechia">
-    <class id="1" days="0010000" start="192" weeks="1111111111111" room="3">
-      <!--W 16:00 - 18:00 1111111111111 R3 -->
-    </class>
-    <class id="10001" days="0000100" start="168" weeks="1111111111111" room="3">
-      <!--F 14:00 - 18:00 1111111111111 R3 -->
-    </class>
-  </solution>`;
+  @Input() xmlData: string = '';
   @Input() courses: Course[] = [];
   @Input() classRooms: Classroom[] = [];
 

@@ -32,7 +32,7 @@ def consume_messages(channel, queue_name):
 
         publish_message(channel, f'{SOLVER_NAME}_result_exchange', message)
 
-    channel.basic_consume(queue=queue_name, on_message_callback=callback, auto_ack=True)
+    channel.basic_consume(queue=queue_name, on_message_callback=callback, auto_ack=False)
     channel.start_consuming()
 
 def publish_message(channel, exchange_name, message):
