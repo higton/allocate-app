@@ -7,6 +7,7 @@
 
 Para rodar uma solução, neste caso o cpsolver-itc2019:
 - Clonar o 'cpsolver-itc2019'
+- Instalar as dependências
 - Adcionar os arquivos que estão dentro do "wrapper-example" e rodar o comando `python3 wrapper_cpsolver.py`
 - Adicionar no requirements.txt do 'cpsolver-itc2019' a linha `pika`
 - No `configuration/default.cfg` modificar o valor do `Termination.TimeOut` para 20. Desssa forma, o algoritmo irá parar de rodar após 20 segundos.

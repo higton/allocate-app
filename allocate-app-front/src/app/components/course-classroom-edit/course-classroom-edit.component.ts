@@ -22,14 +22,7 @@ export class CourseClassroomEditComponent implements OnInit {
   ngOnInit(): void {
     this.copyClassroomsAdded = JSON.parse(JSON.stringify(this.classroomsAdded));
 
-    this.classroomsAvailable = this.userService.classroomsList.filter(classroom => {
-      return !this.classroomsAdded.some(classroomAdded => classroomAdded.name === classroom.name);
-    })
-
-    // remove classrooms that don't have enough seats
-    this.classroomsAvailable = this.classroomsAvailable.filter(classroom => {
-      return classroom.numberOfSeats >= this.seatCount;
-    });
+    this.classroomsAvailable = this.filterClassrooms(this.userService.classroomsList);
   }
 
   addClassroom() {
@@ -38,9 +31,7 @@ export class CourseClassroomEditComponent implements OnInit {
     }
 
     this.classroomsAdded.push(this.selectedClassroom);
-    this.classroomsAvailable = this.userService.classroomsList.filter(classroom => {
-      return !this.classroomsAdded.some(classroomAdded => classroomAdded.name === classroom.name);
-    });
+    this.classroomsAvailable = this.filterClassrooms(this.userService.classroomsList);
     
     this.selectedClassroom = null;
   }
@@ -56,5 +47,20 @@ export class CourseClassroomEditComponent implements OnInit {
 
   goBack() {
     this.changeClassroomsEvent.emit(this.copyClassroomsAdded);
+  }
+
+  filterClassrooms(classroomsList: Classroom[]) {
+    let classroomsAvailable;
+
+    classroomsAvailable = classroomsList.filter(classroom => {
+      return !this.classroomsAdded.some(classroomAdded => classroomAdded.name === classroom.name);
+    })
+
+    // remove classrooms that don't have enough seats
+    classroomsAvailable = classroomsAvailable.filter(classroom => {
+      return classroom.numberOfSeats >= this.seatCount;
+    });
+
+    return classroomsAvailable;
   }
 }

@@ -41,13 +41,12 @@ export class SolutionComponent implements OnInit {
     console.log("Classrooms:", this.userService.classroomsList);
     console.log("Courses:", this.userService.coursesList);
 
-    if (solver === 'enseleitor') {
+    if (solver === 'ensaleitor') {
       this.openEnsaleitor();
     }
 
     let xmlContent = generateXMLInputData(this.userService.coursesList, this.userService.classroomsList)
 
-    console.log("XML content:", xmlContent);
     const response = await this.userService.calculateSolution(solver, xmlContent);
     console.log("Response:", response);
 

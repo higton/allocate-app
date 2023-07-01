@@ -134,8 +134,6 @@ function generateXMLCourses(root, courses) {
             const limit = course.localthreshold;
             const classElem = subpartElem.ele('class', { id: course.id+(10000*i), limit: limit.toString() });
 
-            console.log("classElem id: ", course.id+(10000*i));
-
             for (const classroom of course.classrooms) {
                 classElem.ele('room', { id: classroom.id, penalty: '10' });
             }
@@ -143,7 +141,6 @@ function generateXMLCourses(root, courses) {
             let sequenceSize = 1;
             let sequenceStartTime = -1;
             let expectedPreviousTimeSlot = '';
-            console.log("timeslots: ", course.timeSlots);
             for (const timeSlot of course.timeSlots) {
                 // use getTimeSlotDetails to get the day and startTime
                 const [day, startTime, timePosition] = getTimeSlotDetails(timeSlot);
@@ -231,7 +228,6 @@ function generateXMLCourses(root, courses) {
 }
 
 function getTimeSlotDetails(timeSlot) {
-    console.log("getTimeSlotDetails", timeSlot);
     const day = timeSlot.charAt(0) - 2;
     const startTime = timeHourData[timeSlot.substring(1, 3)];
 

@@ -22,7 +22,7 @@
         </div>
       </div>
       <div class="button-row" *ngIf="!selectedCourse">
-        <button type="submit" class="course-button" (click)="toggleShowList()">Adicionar nova disciplina</button>
+        <button type="submit" class="course-button" (click)="addNewCourse()">Adicionar nova disciplina</button>
       </div>
       <div class="navigation-buttons" *ngIf="!selectedCourse">
         <button class="navigation-button" (click)="navigateToClassrooms()">Voltar para a criação de salas</button>
@@ -39,5 +39,5 @@
         (cancelEvent)="toggleShowList()"></app-course-input>
     </div>
   </div>
-  
+
 </div>

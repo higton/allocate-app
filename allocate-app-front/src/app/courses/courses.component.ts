@@ -32,7 +32,11 @@ export class CoursesComponent implements OnInit {
       this.getCourses();
     }
 
-    this.newCourse = {
+    this.newCourse = this.getEmptyCourse();
+  }
+
+  getEmptyCourse() {
+    return {
       id: 0,
       name: '',
       professor: '',
@@ -44,7 +48,6 @@ export class CoursesComponent implements OnInit {
       semesterPeriod: 1,
       seatCount: 0
     };
-
   }
 
   async getCourses() {
@@ -106,5 +109,11 @@ export class CoursesComponent implements OnInit {
 
   navigateToAllocate() {
     this.router.navigateByUrl('/home/allocate');
+  }
+
+  addNewCourse() {
+    this.toggleShowList();
+
+    this.newCourse = this.getEmptyCourse();
   }
 }

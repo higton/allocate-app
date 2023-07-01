@@ -63,7 +63,6 @@ export class ServerService {
   }
 
   xmlRequest(method: string, route: string, data?: any) {
-    console.log("XML request:", data);
     return this.http.request(method, baseUrl + route, {
       body: data,
       responseType: 'json',

@@ -132,7 +132,6 @@ export class UserService {
               semesterPeriod: course.semester_period,
               seatCount: course.seat_count,
             };
-            console.log("newCourse: ", newCourse);
             this.coursesList.push(newCourse);
           });
 
