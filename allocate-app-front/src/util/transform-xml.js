@@ -29,6 +29,7 @@ const timeHourData = {
 
 
 function generateXMLClassrooms(root, classrooms) {
+    console.log("generateXMLClassrooms", classrooms);
     const xmlClassrooms = root.ele('rooms');
 
     for (const classroom of classrooms) {
@@ -37,8 +38,17 @@ function generateXMLClassrooms(root, classrooms) {
         let sequenceSize = 1;
         let sequenceStartTime = -1;
         let expectedPreviousTimeSlot = undefined;
-        for (const timeSlot of classroom.timeSlots) {
+
+        console.log("classroom.timeSlots", classroom.timeSlots);
+        console.log("classroom: ", classroom);
+
+        // go through all the time slots of the classroom
+        // if the time slot is an empty string filter
+        let filteredTimeSlots = classroom.timeSlots.filter(timeSlot => timeSlot !== '');
+
+        for (const timeSlot of filteredTimeSlots) {
             // use getTimeSlotDetails to get the day and startTime
+            console.log("timeSlot1", timeSlot);
             const [day, startTime, timePosition] = getTimeSlotDetails(timeSlot);
 
 
@@ -48,6 +58,7 @@ function generateXMLClassrooms(root, classrooms) {
 
             // if last 2 caracters equal "m1", it is the first time slot of the day
             if (timeSlot.endsWith('m1')) {
+                console.log("timeSlot2", timeSlot);
                 const [previousDay, ,] = getTimeSlotDetails(expectedPreviousTimeSlot);
 
                 // add a new xml element with the currect length
@@ -75,7 +86,8 @@ function generateXMLClassrooms(root, classrooms) {
                 // console.log("else different time slot");
                 // console.log("expectedPreviousTimeSlot", expectedPreviousTimeSlot);
                 // console.log("previousTimeSlot", previousTimeSlot);
-
+                
+                console.log("timeSlot3", timeSlot);
                 const [previousDay, ,] = getTimeSlotDetails(expectedPreviousTimeSlot);
 
                 // add a new xml element with the currect length
@@ -95,6 +107,7 @@ function generateXMLClassrooms(root, classrooms) {
 
             // if this is the last classroom time slot
             if (timeSlot === classroom.timeSlots[classroom.timeSlots.length - 1]) {
+                console.log("timeSlot4", timeSlot);
                 const [previousDay, ,] = getTimeSlotDetails(expectedPreviousTimeSlot);
 
                 // add a new xml element with the currect length

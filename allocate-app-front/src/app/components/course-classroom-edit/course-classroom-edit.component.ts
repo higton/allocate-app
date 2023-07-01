@@ -10,6 +10,7 @@ import { UserService } from 'src/app/services/user.service';
 })
 export class CourseClassroomEditComponent implements OnInit {
   @Input() classroomsAdded: Classroom[] = [];
+  @Input() seatCount: number = 0;
   @Output() changeClassroomsEvent = new EventEmitter<Classroom[]>();
 
   classroomsAvailable: Classroom[] = [];
@@ -23,6 +24,11 @@ export class CourseClassroomEditComponent implements OnInit {
 
     this.classroomsAvailable = this.userService.classroomsList.filter(classroom => {
       return !this.classroomsAdded.some(classroomAdded => classroomAdded.name === classroom.name);
+    })
+
+    // remove classrooms that don't have enough seats
+    this.classroomsAvailable = this.classroomsAvailable.filter(classroom => {
+      return classroom.numberOfSeats >= this.seatCount;
     });
   }
 

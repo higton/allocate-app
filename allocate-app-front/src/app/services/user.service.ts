@@ -32,7 +32,8 @@ export class UserService {
         $localthreshold: Int!, 
         $time_slot: String!, 
         $classrooms: String!, 
-        $semester_period: String!
+        $semester_period: String!,
+        $seat_count: Int!
         ) {
           addCourse(
             name: $name, 
@@ -42,7 +43,8 @@ export class UserService {
             localthreshold: $localthreshold, 
             time_slot: $time_slot, 
             classrooms: $classrooms,
-            semester_period: $semester_period
+            semester_period: $semester_period,
+            seat_count: $seat_count
           )
         }`;
 
@@ -59,6 +61,7 @@ export class UserService {
             time_slot: newCourse.timeSlots.join(','),
             classrooms: classrooms,
             semester_period: newCourse.semesterPeriod.toString(),
+            seat_count: Number(newCourse.seatCount),
           },
         })
       ).subscribe((response: any) => {
@@ -83,7 +86,8 @@ export class UserService {
           localthreshold,
           time_slot,
           classrooms,
-          semester_period
+          semester_period,
+          seat_count
         }
       }
     `;
@@ -126,6 +130,7 @@ export class UserService {
               timeSlots,
               classrooms: newClassrooms,
               semesterPeriod: course.semester_period,
+              seatCount: course.seat_count,
             };
             console.log("newCourse: ", newCourse);
             this.coursesList.push(newCourse);
@@ -176,6 +181,7 @@ export class UserService {
         $new_time_slot: String!, 
         $new_classrooms: String!,
         $new_semester_period: String!
+        $new_seat_count: Int!
         ) {
           editCourse(
             course_name: $course_name, 
@@ -186,7 +192,8 @@ export class UserService {
             new_localthreshold: $new_localthreshold, 
             new_time_slot: $new_time_slot,
             new_classrooms: $new_classrooms,
-            new_semester_period: $new_semester_period
+            new_semester_period: $new_semester_period,
+            new_seat_count: $new_seat_count
           )
         }
     `;
@@ -205,6 +212,7 @@ export class UserService {
             new_time_slot: newCourse.timeSlots.join(','),
             new_classrooms: classrooms,
             new_semester_period: newCourse.semesterPeriod.toString(),
+            new_seat_count: newCourse.seatCount,
           },
         })
       ).subscribe((response: any) => {

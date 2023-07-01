@@ -67,7 +67,10 @@ export class CourseInputComponent implements OnInit {
       this.course.department && 
       this.course.groupPeriod &&
       this.course.professor &&
-      this.course.semesterPeriod) 
+      this.course.semesterPeriod &&
+      this.course.timeSlots.length > 0 &&
+      this.course.seatCount > 0
+    )
     {
       this.changeCourseEvent.emit(this.course);
     } else {
@@ -83,7 +86,7 @@ export class CourseInputComponent implements OnInit {
     timeSlots.sort((a, b) => {
       const aTime = parseInt(a.slice(0, -2));
       const bTime = parseInt(b.slice(0, -2));
-    
+
       if (aTime === bTime) {
         const aSlot = parseInt(a.slice(-1));
         const bSlot = parseInt(b.slice(-1));

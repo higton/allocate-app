@@ -11,7 +11,7 @@
       <h2>Salas adicionadas:</h2>
       <form class="course-form">
         <div class="form-row" *ngFor="let classroom of classroomsAdded">
-          <label>Sala: {{ classroom.name }}</label>
+          <label>Sala: {{ classroom.name  }} - vagas: {{ classroom.numberOfSeats }}</label>
           <button class="course-button remove-button" (click)="removeClassroom(classroom)">Remover</button>
         </div>
         <div class="button-row">

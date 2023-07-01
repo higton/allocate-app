@@ -10,4 +10,5 @@ export class Course {
     timeSlots: string[] = [];
     classrooms: Classroom[] = [];
     semesterPeriod: Number = 1;
+    seatCount: number = 0;
 }

@@ -13,6 +13,11 @@
       </div>
 
       <div class="form-row">
+        <label for="course-seat-number">Vagas ofertadas:</label>
+        <input type="text" id="course-seat-number" [(ngModel)]="course.seatCount" name="seat">
+      </div>
+
+      <div class="form-row">
         <label for="course-group-period">Agrupamento das aulas (quantas aulas por dia):</label>
         <input type="text" id="course-group-period" [(ngModel)]="course.groupPeriod" placeholder="2 4" name="groupPeriod"> 
       </div>
@@ -62,5 +67,5 @@
 </div>
 
 <div *ngIf="showClassrooms">
-  <app-course-classroom-edit [classroomsAdded]="classrooms" (changeClassroomsEvent)="updateClassrooms($event)"></app-course-classroom-edit>
+  <app-course-classroom-edit [classroomsAdded]="classrooms" [seatCount]="course.seatCount"  (changeClassroomsEvent)="updateClassrooms($event)"></app-course-classroom-edit>
 </div>

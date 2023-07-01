@@ -53,6 +53,7 @@ async function getExchanges(req, res) {
 
 async function calculateSolver(req, res) {    
     try {
+        console.log("calculateSolver");
         const solver = req.params.solver;
 
         console.log("solvers: ", solvers);
@@ -73,11 +74,13 @@ async function calculateSolver(req, res) {
             request_made[solver] = true;
 
             // send a message to the solver to start calculating
+            console.log("sending message to solver: ", solver);
             await channel.publish(`${solver}_start_calculating_exchange`, '',  Buffer.from(xmlContent));
             res.status(200).json({ message: 'Calculating' });
             return;
         } else { // if the request was already made, see if the result is ready
-            const { queue } = await channel.assertQueue('test', { exclusive: true });
+            console.log("request was already made");
+            const { queue } = await channel.assertQueue('${solver}_result_exchange_queue', { exclusive: true });
             await channel.bindQueue(queue, `${solver}_result_exchange`, '');
 
             const queueInfo = await channel.checkQueue(queue);

@@ -30,6 +30,7 @@ let UserSchema = buildSchema(`
     time_slot: String,
     classrooms: String,
     semester_period: String,
+    seat_count: Int,
   }
   type Classroom {
     id: Int,
@@ -65,6 +66,7 @@ let UserSchema = buildSchema(`
       time_slot: String!, 
       classrooms: String!,
       semester_period: String!
+      seat_count: Int,
     ): String,
     removeCourse(
       course_name: String!,
@@ -79,6 +81,7 @@ let UserSchema = buildSchema(`
       new_time_slot: String!, 
       new_classrooms: String!,
       new_semester_period: String!
+      new_seat_count: Int,
     ): String,
     addClassroom(
       classroom_name: String!, 
@@ -221,7 +224,8 @@ const rootResolver = {
       localthreshold,
       time_slot,
       classrooms,
-      semester_period
+      semester_period,
+      seat_count,
     }, req) => {
     await checkToken(req)
       .then((result) => {
@@ -231,7 +235,7 @@ const rootResolver = {
         return new Error("It is necessary to login")
       });
 
-    return await db.addCourse(name, professor, group_period, department, localthreshold, time_slot, classrooms, semester_period);
+    return await db.addCourse(name, professor, group_period, department, localthreshold, time_slot, classrooms, semester_period, seat_count);
   },
 
   removeCourse: async ({ course_name }, req) => {
@@ -257,7 +261,8 @@ const rootResolver = {
       new_localthreshold,
       new_time_slot,
       new_classrooms,
-      new_semester_period
+      new_semester_period,
+      new_seat_count,
     }, req) => {
     await checkToken(req)
       .then((result) => {
@@ -276,7 +281,8 @@ const rootResolver = {
       new_localthreshold,
       new_time_slot,
       new_classrooms,
-      new_semester_period
+      new_semester_period,
+      seat_count
     );
   },
 

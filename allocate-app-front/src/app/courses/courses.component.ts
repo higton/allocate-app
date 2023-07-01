@@ -42,6 +42,7 @@ export class CoursesComponent implements OnInit {
       timeSlots: [],
       classrooms: [],
       semesterPeriod: 1,
+      seatCount: 0
     };
 
   }
@@ -51,7 +52,14 @@ export class CoursesComponent implements OnInit {
   }
 
   async addCourseToAccount(newCourse: Course) {
-    if (newCourse.name && newCourse.professor && newCourse.groupPeriod && newCourse.department && newCourse.semesterPeriod) {
+    if (
+      newCourse.name && 
+      newCourse.professor && 
+      newCourse.groupPeriod && 
+      newCourse.department && 
+      newCourse.semesterPeriod &&
+      newCourse.timeSlots.length > 0
+      ) {
       await this.userService.addCourse(newCourse);
     }
 

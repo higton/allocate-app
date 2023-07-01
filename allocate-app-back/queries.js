@@ -30,7 +30,8 @@ async function init() {
 			localthreshold INT NOT NULL,
 			time_slot VARCHAR(600) NOT NULL,
 			classrooms VARCHAR(600) NOT NULL,
-			semester_period VARCHAR(20) NOT NULL
+			semester_period VARCHAR(20) NOT NULL,
+			seat_count INT NOT NULL
 		)
 		`, (res, err) => {
 		console.log(res, err);
@@ -151,11 +152,11 @@ async function getCourses() {
 		})
 }
 
-async function addCourse(name, professor, group_period, department, localthreshold, time_slot, classrooms, semester_period) {
+async function addCourse(name, professor, group_period, department, localthreshold, time_slot, classrooms, semester_period, seat_count) {
 	return pool.query(`
-		INSERT INTO COURSE (name, professor, group_period, department, localthreshold, time_slot, classrooms, semester_period)
-		VALUES ($1, $2, $3, $4, $5, $6, $7, $8)`,
-		[name, professor, group_period, department, localthreshold, time_slot, classrooms, semester_period]
+		INSERT INTO COURSE (name, professor, group_period, department, localthreshold, time_slot, classrooms, semester_period, seat_count)
+		VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9)`,
+		[name, professor, group_period, department, localthreshold, time_slot, classrooms, semester_period, seat_count]
 	).then((response) => {
 		return "Course added!"
 	}).catch((error) => {
@@ -184,7 +185,8 @@ async function editCourse(
 	new_localthreshold,
 	new_time_slot,
 	new_classrooms,
-	new_semester_period
+	new_semester_period,
+	new_seat_count
 ) {
 	return pool.query(`
 		UPDATE COURSE
@@ -196,8 +198,9 @@ async function editCourse(
 		time_slot = ($7),
 		classrooms = ($8),
 		semester_period = ($9)
+		seat_count = ($10)
 		WHERE name = ($1)`,
-		[course_name, new_name, new_professor, new_group_period, new_department, new_localthreshold, new_time_slot, new_classrooms, new_semester_period]
+		[course_name, new_name, new_professor, new_group_period, new_department, new_localthreshold, new_time_slot, new_classrooms, new_semester_period, new_seat_count]
 	).then((response) => {
 		return "Course edited!"
 	}).catch((error) => {
