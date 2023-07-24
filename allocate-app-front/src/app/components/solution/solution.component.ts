@@ -51,12 +51,13 @@ export class SolutionComponent implements OnInit {
 
     console.log("Response:", response);
 
-    if (response === "Calculating") {
-      this.htmlResponse = '<h1>Calculating...</h1>';
-    }
-
     if (response !== "Calculating" && response !== "") {
       this.xmlSolution = response;
+    } else {
+      // try again
+      setTimeout(() => {
+        this.calculate(solver);
+      }, 2000);
     }
   }
 
