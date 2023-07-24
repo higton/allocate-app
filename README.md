@@ -2,6 +2,14 @@
 
 ## Como usar
 
+### RabbitMQ Broker (Docker)
+
+Para rodar o RabbitMQ Broker, basta entrar na pasta `rabbitmq-broker` e rodar o seguinte comando:
+
+```bash
+docker run -p5672:5672 -p15672:15672 my_rabbit
+```
+
 ### Frontend
 
 Para rodar o frontend, basta entrar na pasta `allocate-app-front` e rodar os seguintes comandos:
@@ -20,13 +28,6 @@ npm install
 npm start
 ```
 
-### RabbitMQ Broker (Docker)
-
-Para rodar o RabbitMQ Broker, basta entrar na pasta `rabbitmq` e rodar o seguinte comando:
-
-```bash
-docker run -p5672:5672 -p15672:15672 my_rabbit
-```
 ### Solução (CPSolver)
 
 Para rodar a solução, neste caso o cpsolver-itc2019, basta seguir os seguintes passos:
