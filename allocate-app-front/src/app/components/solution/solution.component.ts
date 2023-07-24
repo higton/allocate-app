@@ -48,7 +48,12 @@ export class SolutionComponent implements OnInit {
     let xmlContent = generateXMLInputData(this.userService.coursesList, this.userService.classroomsList)
 
     const response = await this.userService.calculateSolution(solver, xmlContent);
+
     console.log("Response:", response);
+
+    if (response === "Calculating") {
+      this.htmlResponse = '<h1>Calculating...</h1>';
+    }
 
     if (response !== "Calculating" && response !== "") {
       this.xmlSolution = response;
@@ -57,7 +62,7 @@ export class SolutionComponent implements OnInit {
 
   // TODO: remove this code and use the new plugin interface
   openEnsaleitor() {
-    let classrooms: Classroom[] = [];
+    let classrooms: any[] = [];
     let courses: any[] = [];
 
     const standardTimeslots = TimeslotHelper.getStandardTimeSlots();
@@ -65,7 +70,7 @@ export class SolutionComponent implements OnInit {
     for (let classroom of this.userService.classroomsList) {
       classrooms.push({
         id: classroom.id,
-        name: classroom.name,
+        name: classroom.name.split(' ').join(''),
         numberOfSeats: classroom.numberOfSeats,
         timeSlots: TimeslotHelper.invertTimeSlots(classroom.timeSlots, standardTimeslots),
       });
@@ -81,7 +86,7 @@ export class SolutionComponent implements OnInit {
         localthreshold: 10,
         timeSlots: course.timeSlots,
         grouping: course.groupPeriod,
-        totalClasses: course.groupPeriod.split(',').map(Number).reduce((a, b) => a + b, 0), // totalClasses = the sum of all numbers in course.groupPeriod
+        totalClasses: this.sumNumbersInString(course.groupPeriod), // totalClasses = the sum of all numbers in course.groupPeriod
         classrooms: course.classrooms,
         semesterPeriod: course.semesterPeriod,
       });
@@ -109,5 +114,14 @@ export class SolutionComponent implements OnInit {
         console.log("Error during POST request", error);
       }
     );
+  }
+
+  sumNumbersInString(inputString: string) {
+    var numbers = inputString.split(" ");
+    var total = 0;
+    for (var i = 0; i < numbers.length; i++) {
+      total += parseInt(numbers[i]);
+    }
+    return total;
   }
 }

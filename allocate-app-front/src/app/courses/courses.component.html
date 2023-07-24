@@ -2,7 +2,7 @@
   <div>
     <div *ngIf="showList" class="course-section modern">
       <h2 *ngIf="!selectedCourse">Disciplinas</h2>
-      <h2 *ngIf="selectedCourse">Editar informações do curso</h2>
+      <h2 *ngIf="selectedCourse">Editar informações da disciplina</h2>
       <div *ngFor="let item of userService.coursesList; let i = index">
         <div class="courses-section modern">
           <div *ngIf="item === selectedCourse">

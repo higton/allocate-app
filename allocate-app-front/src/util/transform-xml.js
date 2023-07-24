@@ -272,6 +272,24 @@ function generateXMLDistributions(root, courses) {
             courseElem.ele('class', { id: course.id+(10000*i) });
         }
     }
+
+    for (const course of courses) {
+        const courseElem = xmlCourses.ele('distribution', { type: "SameStart", required: "true" });
+
+        const grouping = course.groupPeriod.split(' ');
+        for (let i = 0; i < grouping.length; i++) {
+            courseElem.ele('class', { id: course.id+(10000*i) });
+        }
+    }
+
+    for (const course of courses) {
+        const courseElem = xmlCourses.ele('distribution', { type: "SameRoom", penalty: 4 });
+
+        const grouping = course.groupPeriod.split(' ');
+        for (let i = 0; i < grouping.length; i++) {
+            courseElem.ele('class', { id: course.id+(10000*i) });
+        }
+    }
 }
 
 export function generateXMLInputData(courses, classrooms) {
